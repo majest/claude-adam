@@ -288,9 +288,9 @@ kbd{
 
     <div class="rail-foot">
       <button class="btn" id="regen">Regrow</button>
-      <button class="btn ghost" id="export">Export</button>
+      <button class="btn ghost" id="export">Save PNG</button>
     </div>
-    <p class="hint"><kbd>R</kbd> regrow &nbsp;·&nbsp; <kbd>E</kbd> export</p>
+    <p class="hint"><kbd>R</kbd> regrow &nbsp;·&nbsp; <kbd>S</kbd> save</p>
   </section>
 
   <aside class="stats" id="stats" aria-live="polite"></aside>
@@ -299,7 +299,7 @@ kbd{
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Export image">
   <div class="panel">
     <img id="sheetImg" alt="Rendered forest, full resolution">
-    <p>Right-click (or long-press) the image to save it &nbsp;·&nbsp; <kbd>Esc</kbd> to close</p>
+    <p id="sheetNote">Right-click (or long-press) the image to save it &nbsp;·&nbsp; <kbd>Esc</kbd> to close</p>
   </div>
 </div>
 
@@ -1245,19 +1245,95 @@ function paintDrift(ctx, W, H, parts, t, opts){
   document.getElementById("shuffle").addEventListener("click", newSeed);
   document.getElementById("regen").addEventListener("click", newSeed);
 
-  function openSheet(){
-    sheetImg.src = canvas.toDataURL("image/png");
+  /* --- saving ---
+     Published pages cannot start a download themselves, so ask the viewer's
+     runtime to hand over the file. Falling back, in order: a plain download
+     when the page is its own top-level document, then a preview to save by hand. */
+  const saveBtn = document.getElementById("export");
+  const SAVE_LABEL = saveBtn.textContent;
+  let busy = false, flashT = null, sheetUrl = null;
+
+  function resetBtn(){ clearTimeout(flashT); saveBtn.textContent = SAVE_LABEL; busy = false; }
+  function flash(msg){ saveBtn.textContent = msg; clearTimeout(flashT); flashT = setTimeout(resetBtn, 1800); }
+
+  function fileName(ext){
+    const s = seedEl.value.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "forest";
+    return "understory-" + s + "-" + opts.season + "-" + opts.light + "." + ext;
+  }
+  const toBlob = (type, q) => new Promise(res => canvas.toBlob(res, type, q));
+
+  function openSheet(blob, note){
+    if (sheetUrl) URL.revokeObjectURL(sheetUrl);
+    sheetUrl = URL.createObjectURL(blob);
+    sheetImg.src = sheetUrl;
+    if (note) document.getElementById("sheetNote").innerHTML = note;
     sheet.setAttribute("open", "");
   }
-  function closeSheet(){ sheet.removeAttribute("open"); sheetImg.removeAttribute("src"); }
-  document.getElementById("export").addEventListener("click", openSheet);
+  function closeSheet(){
+    sheet.removeAttribute("open");
+    sheetImg.removeAttribute("src");
+    if (sheetUrl){ URL.revokeObjectURL(sheetUrl); sheetUrl = null; }
+  }
+
+  function browserDownload(blob, name){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
+  async function saveImage(){
+    if (busy) return;
+    busy = true;
+    saveBtn.textContent = "Saving…";
+    let blob;
+    try { blob = await toBlob("image/png"); } catch (e){ blob = null; }
+    if (!blob){ flash("Can't save"); return; }
+
+    let dl = null;
+    try {
+      if (window.claude && typeof window.claude.use === "function")
+        dl = await window.claude.use("downloads");
+    } catch (e){ dl = null; }
+
+    if (dl){
+      try {
+        await dl.save({ filename: fileName("png"), data: blob });
+        return flash("Saved");
+      } catch (err){
+        const code = err && err.code;
+        if (code === "declined") return flash("Not saved");
+        if (code === "rate_limited") return flash("Try again");
+        if (code === "too_large"){
+          try {
+            const jpg = await toBlob("image/jpeg", .92);
+            await dl.save({ filename: fileName("jpg"), data: jpg });
+            return flash("Saved");
+          } catch (e2){
+            if (e2 && e2.code === "declined") return flash("Not saved");
+          }
+        }
+        // anything else: fall through to the manual routes
+      }
+    }
+
+    if (window.top === window.self){
+      browserDownload(blob, fileName("png"));
+      return flash("Saved");
+    }
+    openSheet(blob, "Right-click (or long-press) the image to save it &nbsp;·&nbsp; <kbd>Esc</kbd> to close");
+    resetBtn();
+  }
+
+  saveBtn.addEventListener("click", saveImage);
   sheet.addEventListener("click", e => { if (e.target === sheet) closeSheet(); });
 
   addEventListener("keydown", e => {
     if (e.key === "Escape") return closeSheet();
     if (e.target.tagName === "INPUT" || e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === "r" || e.key === "R"){ e.preventDefault(); newSeed(); }
-    if (e.key === "e" || e.key === "E"){ e.preventDefault(); openSheet(); }
+    if (e.key === "s" || e.key === "S"){ e.preventDefault(); saveImage(); }
   });
 
   let rt;

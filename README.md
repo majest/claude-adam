@@ -17,7 +17,24 @@ The same seed always grows the same forest.
 | **Stand** | Temperate, Boreal, Wetland — the species mix drawn from. |
 | **Density** | How many of each band's planned stems actually grow. |
 | **Regrow** / <kbd>R</kbd> | New seed. |
-| **Export** / <kbd>E</kbd> | Opens the current frame full-resolution; right-click or long-press to save. |
+| **Save PNG** / <kbd>S</kbd> | Saves the current frame as a PNG. |
+
+## Saving
+
+A published Artifact runs sandboxed and cannot start a download itself, so the page
+asks the viewer's runtime to hand the file over — `claude.use("downloads")`, then
+`save({filename, data})`, which the viewer confirms. The artifact is published with
+`capabilities: {downloads: true}` for this reason.
+
+Three routes, tried in order, so the button means the same thing everywhere:
+
+1. **Runtime save** when the page is running as a published Artifact. Declining is a
+   normal outcome, not an error; an over-16 MiB frame retries as JPEG.
+2. **Plain download** when the page is its own top-level document — opening
+   `index.html` locally takes this route.
+3. **Preview to save by hand** if neither is available, as the last resort.
+
+Files are named for what made them: `understory-alder-hollow-autumn-dawn.png`.
 
 ## How it works
 
