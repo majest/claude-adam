@@ -17,17 +17,39 @@ on:
 permissions:
   contents: write
 
-env:
-  TARGET: majest/majest.github.io
-
 jobs:
   probe:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Two targets. The site repo is archived, which refuses every writer
+        # including its owner, so on its own it cannot tell us whether the
+        # refusal is about archiving or about crossing a repo boundary.
+        # claude-alan is live and owned by the same account, so it isolates
+        # the question.
+        target:
+          - majest/majest.github.io
+          - majest/claude-alan
+    env:
+      TARGET: ${{ matrix.target }}
     steps:
       - name: Where this token comes from
         run: |
           echo "workflow runs in : $GITHUB_REPOSITORY"
           echo "probing          : $TARGET"
+
+      - name: What the API says this token may do to the target
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          gh api "repos/$TARGET" --jq '{archived, private, permissions}' 2>api.err
+          if [ $? -ne 0 ]; then
+            echo "API: refused"
+            cat api.err
+          fi
+          exit 0
 
       - name: Can the token READ the site repo?
         id: read
@@ -82,7 +104,7 @@ jobs:
       - name: Record the answer
         run: |
           {
-            echo "## Can claude-adam publish into $TARGET with the default token?"
+            echo "## claude-adam -> $TARGET, with only the default GITHUB_TOKEN"
             echo
             echo "| | verdict |"
             echo "| --- | --- |"
