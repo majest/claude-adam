@@ -99,7 +99,8 @@ Then the rest of the page. The rules:
 - **One file.** The HTML, the CSS and the JavaScript all go in this one file.
 - **No installing.** Nobody should have to run a command to make it work.
 - **It must work when you open it.** Double-click the file. Try it that way.
-- **Nothing from the internet** except Google Fonts. Draw pictures with code.
+- **Nothing from the internet** except Google Fonts — and the AI models listed
+  in `AI-TOOLBOX.md`, which are the one exception. Draw pictures with code.
 - **It must work on a tablet.** Try a narrow window. Nothing should fall off
   the side.
 
@@ -184,7 +185,16 @@ reachable from inside the house.
 
 But the page can still *use* what that computer made. There are two ways.
 
-### The easy way: make it first, keep the file
+### The quickest way: use the toolbox
+
+Most AI things can happen **right in the page**, with no computer at home
+involved at all. Following hands through the camera, listening to someone
+speak, talking back, guessing what a drawing is.
+
+**`AI-TOOLBOX.md` has all of them, with code to copy.** Look there first.
+The ones at the top of its table are small and quick and work on a tablet.
+
+### The easy way for pictures: make them first, keep the file
 
 The AI draws the pictures once, on the computer at home. Then you save those
 pictures into the project, like any other file. The page just loads them.
