@@ -178,26 +178,52 @@ makes up words.
 
 That can be done. But it works differently.
 
-**The page must never ask the computer at home for help.** It has to keep
-working on a phone, at a friend's house, and at school. A page that phones home
-is broken for everyone except Adam.
+**The page must never talk straight to the computer at home.** It has to keep
+working on a phone, at a friend's house, and at school. That computer is only
+reachable from inside the house.
 
-(The game helper further down is different — it lives on the internet, so any
-computer anywhere can reach it.)
+But the page can still *use* what that computer made. There are two ways.
 
-So the AI does its work *first*, somewhere else. Only what it made comes back
-into the project as an ordinary file:
+### The easy way: make it first, keep the file
 
-- pictures the AI drew once, saved as picture files
-- words or levels made once, saved in a `.json` file
-- a small AI that runs inside the page itself, so it needs no help at all
+The AI draws the pictures once, on the computer at home. Then you save those
+pictures into the project, like any other file. The page just loads them.
 
-There is a computer at home that does this work. How to reach it is in the
-family notes on Artur's computer — **not in here, because anyone can read this
-repo.**
+Nothing has to be switched on. It works everywhere, forever. **Do it this way
+unless there's a real reason not to.**
 
-If those notes aren't there, that computer isn't available. Say so. Don't
-invent something instead.
+### The other way: leave a note and wait
+
+If something has to be made while someone is playing, the page still doesn't
+talk to the computer at home. It leaves a job in a queue on the internet. The
+computer at home keeps checking that queue, picks the job up, makes the thing,
+and puts the finished file somewhere the page can fetch it.
+
+```
+  your page  ──▶  a queue on the internet
+                         │
+                         ▼   the computer at home checks the queue
+                   makes the picture
+                         │
+  your page  ◀──── the finished file
+```
+
+The computer at home **goes and gets the work.** Nothing reaches in to it. That
+is what keeps it safe.
+
+Two things to tell Adam:
+
+- The computer at home has to be **switched on**. If it isn't, the job waits.
+  The game still has to work while it waits, and say "still thinking".
+- It is **slow** — nearer a minute than a second. Good for making a picture
+  before a level starts. No good in the middle of a game.
+
+This queue **hasn't been built yet.** The idea works, but the pieces aren't
+made. Say that instead of pretending.
+
+How to reach the computer at home is in the family notes on Artur's computer —
+**not in here, because anyone can read this repo.** If those notes aren't
+there, that computer isn't available. Say so. Don't invent something instead.
 
 ---
 
