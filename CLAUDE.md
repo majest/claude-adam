@@ -1,140 +1,144 @@
 # Adam's projects
 
-This repo is where Adam keeps the things he builds with Claude.
-Everything in here gets published to a website automatically.
+This is where Adam keeps the things he makes with Claude.
+Everything here goes onto a website by itself.
 
 Adam's page: **https://majest.github.io/claude-adam/**
-All the projects: **https://majest.github.io/**
+Everyone's page: **https://majest.github.io/**
 
-If you are Claude working in this repo, read the whole file before you make anything.
-If you are Adam — hello! You can read this too. It says how everything works.
+Hello Adam! You can read this. It says how everything works.
 
-Everything needed to build a project is in this file. If this repo happens to sit
-inside the family workspace, there is another `CLAUDE.md` one level up describing
-how the repos fit together — useful context, but not required reading to start.
+---
+
+## Talking to Adam
+
+**Adam is 8.** How you talk to him matters as much as the code you write.
+
+- Short sentences. One idea at a time.
+- Normal words. Say "picture", not "image asset". Say "save", not "persist".
+- If you need a computer word, say what it means once, simply.
+- Show him the thing working. Don't describe it — open it.
+- When something breaks, say what broke and what you'll try next. Don't write
+  him a paragraph of reasons.
+- Ask when you don't know what he wants. He is allowed to change his mind.
+- Tell him when his idea is good. It usually is.
+
+Never make him feel slow for not knowing a word. He is eight.
+
+---
+
+## When Artur is talking
+
+Artur is Adam's dad.
+
+If a line starts with **`Artur:`** it came from Artur, not Adam.
+
+- Do what it says, even if Adam asked for something different.
+- Only Artur can say yes to: changing anything in `.github/`, putting a big
+  file in here, or anything that costs money.
+- If Adam asks for one of those, say "we need to ask Artur first."
 
 ---
 
 ## First: which project?
 
-Before changing anything, be certain which project you are in. Names overlap,
-ideas are similar, and a change made in the wrong folder is worse than no
-change — it quietly breaks something that was working.
+Look before you change anything.
 
-If Adam says "make it bigger" or "add a sound" and it is not obvious which
-project is meant, **stop and ask.** List what is there and let Adam pick:
+If Adam says "make it bigger" and you are not sure which project he means,
+**stop and ask him.** Show him the list:
 
 ```sh
 ls projects/
 ```
 
-Ask when any of these is true:
+Ask when:
 
-- There is more than one project it could plausibly be.
-- Two projects have similar names or are about similar things.
-- Adam hasn't named the project in this conversation.
-- You are about to start something new and it is not clear whether it is a new
-  project or a change to one that already exists.
+- More than one project could be the right one.
+- Two projects sound alike.
+- Adam hasn't said the name yet.
+- You don't know if he wants a new project or a change to an old one.
 
-Guessing is not being helpful. One short question costs a few seconds; editing
-the wrong project costs Adam their work.
+Changing the wrong project breaks something that was working. Asking takes two
+seconds. Always ask.
 
 ---
 
 ## Making a new project
 
-Every project lives in its own folder inside `projects/`.
-Nothing goes in the top level of the repo.
+Every project gets its own folder inside `projects/`.
 
 ```
 projects/
-  understory/        <- one project
+  alien-clash/
     index.html
     project.json
-  your-new-thing/    <- the next one
+  snake-game/
     index.html
     project.json
 ```
 
-Pick a short folder name in lowercase with hyphens instead of spaces:
-`snake-game`, `star-map`, `drum-machine`. No capitals, no spaces, no underscores.
-The folder name becomes the web address, so `projects/star-map/` ends up at
-`https://majest.github.io/claude-adam/star-map/`.
+The folder name must be small letters with hyphens instead of spaces, like
+`snake-game`. No capitals. No spaces. The folder name becomes the web address.
 
-### Every project needs exactly two files
+### Each project needs two files
 
-**1. `index.html` — the project itself.**
+**1. `index.html`** — this is the project.
 
-It has to start with these two lines, in this order, at the very top:
+It has to start with these two lines:
 
 ```html
 <!doctype html>
 <meta charset="utf-8">
 ```
 
-Both matter. Without the first, browsers fall back to an old rendering mode and
-the layout goes strange. Without the second, every accent, arrow, emoji and `·`
-in the page turns into mojibake like `Â·`.
+Without the first line the page looks wrong. Without the second line, arrows
+and emoji turn into nonsense like `Â·`.
 
-Then the rest of the page. The rules for what goes inside:
+Then the rest of the page. The rules:
 
-- **One file.** All the HTML, CSS and JavaScript go in this one file. No separate
-  `style.css`, no separate `script.js`, no `src/` folder.
-- **No installing.** No npm, no build step, no bundler. If someone has to run a
-  command before it works, it is wrong.
-- **It must work by opening the file.** Double-clicking `index.html` should run it.
-  Test it that way before you finish.
-- **Nothing loaded from the internet** except Google Fonts. No CDN scripts, no
-  jQuery from a URL, no images hotlinked from another site. Draw pictures in code,
-  or paste them in as a `data:` URI.
-- **Make it work on a phone too.** Kids will open this on a tablet. Use a
-  `<meta name="viewport" content="width=device-width, initial-scale=1">` and don't
-  let anything spill off the side of the screen.
+- **One file.** The HTML, the CSS and the JavaScript all go in this one file.
+- **No installing.** Nobody should have to run a command to make it work.
+- **It must work when you open it.** Double-click the file. Try it that way.
+- **Nothing from the internet** except Google Fonts. Draw pictures with code.
+- **It must work on a tablet.** Try a narrow window. Nothing should fall off
+  the side.
 
-**2. `project.json` — how it shows up on the website.**
+**2. `project.json`** — this is what the website shows.
 
 ```json
 {
-  "title": "Star Map",
-  "emoji": "⭐",
-  "description": "A sky full of stars you can spin around. Click any star to find out its name and how far away it is."
+  "title": "Alien Clash",
+  "emoji": "👽",
+  "description": "A card game where every alien is invented the second you flip it. Pick a power, the biggest number wins the pile."
 }
 ```
 
-- `title` — the proper name, with capital letters. Short.
-- `emoji` — one emoji that suits it. This is the picture on its card.
-- `description` — one or two sentences. This is the important one, see below.
-
 ### Writing the description
 
-The description is what people read on the website to decide whether to click.
-Write it for someone Adam's age who has never seen the project.
+This is what people read before they click. Write it for a kid who has never
+seen it.
 
-- Say **what it is** and **what you can do with it**. Not how it was built.
-- Two sentences at most. Around 30 words.
-- Plain words. No "leverages", no "utilises", no "procedurally generated
-  parametric system". If a word would need explaining, use a different word.
-- Present tense, talking to the reader: "you can", "click any star".
+- Say what it is and what you can do with it.
+- Two sentences. No more.
+- Normal words only.
 
-Good: *"A forest that grows itself. Give it a name like alder-hollow and the same
+Good: *"A forest that grows itself. Type a name like alder-hollow and the same
 trees grow every time."*
 
-Not good: *"An interactive canvas-based application implementing deterministic
-seeded generation of arboreal scenery."*
+Not good: *"An interactive card-based application with procedurally generated
+entity attributes."*
 
-### A README is optional
+That second one is about Alien Clash. Nobody would know.
 
-If a project is a big one and there is more to say — how it works inside, what the
-controls do — add a `README.md` in the project's folder. Understory has one.
-Small projects don't need it.
+### A `README.md` is optional
+
+Only for big projects, when there is more to say.
 
 ---
 
-## How it gets published
+## Always push
 
-### Every change has to be pushed
-
-**Finish a change, then commit it and push it to `main`. Every time.**
+When you finish a change, save it to GitHub straight away:
 
 ```sh
 git add -A
@@ -142,87 +146,107 @@ git commit -m "say what changed"
 git push
 ```
 
-This is not tidying up for later — it is the only thing that puts the work on
-the website. A change sitting on the computer uncommitted does not exist as far
-as the site is concerned: Adam will look at their page, see the old version,
-and think it is broken.
+**Every time.** This is the bit that puts it on the website.
 
-So don't leave finished work behind. If Adam asks for three things, push
-after each one rather than saving them all up — small pushes are easier to undo
-if one turns out wrong.
+If you don't push, Adam will look at his page, see the old version, and think
+it is broken. So don't leave finished work sitting on the computer.
 
-If a change is genuinely half-finished and shouldn't go live yet, say so out
-loud rather than quietly leaving it uncommitted, so Adam knows it is waiting.
+If Adam asks for three things, push after each one.
 
-### What happens after the push
+If something isn't finished, tell him it's waiting. Don't go quiet about it.
 
-Once a change lands on the `main` branch, GitHub does this by itself:
+### What happens next
 
-1. It looks in `projects/` and finds every folder with a `project.json`.
-2. It copies each project onto the web.
-3. It builds Adam's page listing them all.
-4. The big showcase site picks up the new list on its own.
+GitHub does the rest by itself, in about a minute:
 
-It takes about a minute. Then the project is live at
-`https://majest.github.io/claude-adam/<folder-name>/`.
+1. It looks in `projects/` for folders with a `project.json`.
+2. It puts each project on the web.
+3. It builds Adam's page.
+4. The big website picks up the new list.
 
-The `.github/` folder is what does all this. **Don't edit anything in `.github/`.**
-If publishing breaks, tell Artur — it isn't something to fix from inside a project.
+Then it is live at `https://majest.github.io/claude-adam/<folder-name>/`.
+
+**Don't change anything in `.github/`.** That folder does all of this. If it
+breaks, tell Artur.
 
 ---
 
 ## Using AI in a project
 
-Adam might want a project that uses AI — a model that draws pictures, writes
-words, or recognises what something is. That is possible, but it works
-differently from everything else here, and the difference matters.
+Adam might want a project that uses AI — something that draws a picture or
+makes up words.
 
-**The published page never talks to a server.** It has to keep working on a
-phone, at a friend's house, on a school computer, and in ten years' time. A
-page that phones home is broken for everyone except the person who built it.
+That can be done. But it works differently.
 
-So AI work happens somewhere else, ahead of time, and only the **result** comes
-back into the project as an ordinary file:
+**The page must never ask a computer at home for help.** It has to keep working
+on a phone, at a friend's house, and at school. A page that phones home is
+broken for everyone except Adam.
 
-- pictures a model drew once, saved as images
-- words or level data generated once, saved as a `.json` file
-- a small model converted to run inside the browser itself, so the page does the
-  thinking on its own with no server anywhere
+So the AI does its work *first*, somewhere else. Only what it made comes back
+into the project as an ordinary file:
 
-There is a machine at home set up to do that work. How to reach it and how to
-use it are in the workspace notes on the family computer — deliberately not in
-this repo, which is public. A Claude session working in the family workspace
-will already have them.
+- pictures the AI drew once, saved as picture files
+- words or levels made once, saved in a `.json` file
+- a small AI that runs inside the page itself, so it needs no help at all
 
-If you are working from a clone somewhere else, that machine is not there. Say
-so plainly rather than inventing a substitute or pointing the page at a server.
+There is a computer at home that does this work. How to reach it is in the
+family notes on Artur's computer — **not in here, because anyone can read this
+repo.**
 
----
-
-## Things that must never go in this repo
-
-This repo is **public**. Anyone on the internet can read every file in it, and
-everything that has ever been in it. So:
-
-- **First names only.** No surnames, ever — not in the code, not in a comment,
-  not in a description.
-- No school name, no address, no town, no birthday, no age.
-- No email addresses and no phone numbers.
-- No photographs of Adam or of anyone he knows. Pictures drawn in code are fine.
-- No passwords, no API keys, no tokens. Nothing that looks like a secret.
-
-If a project idea needs any of those to work, it needs a different idea. Say so.
+If those notes aren't there, that computer isn't available. Say so. Don't
+invent something instead.
 
 ---
 
-## A checklist before you finish
+## Making a game two people can play
 
-- [ ] The folder is `projects/<lowercase-hyphen-name>/`
+Adam might want a game two people play at the same time, on different
+computers.
+
+That needs a helper out on the internet, because the two computers have to pass
+messages to each other.
+
+Think of it as **a shared notepad in the sky.** One player writes something,
+the other reads it. It forgets everything after an hour, so nothing is kept.
+
+It works best for taking turns — noughts and crosses, battleships, a quiz
+buzzer, drawing together.
+
+Two rules:
+
+- Adam can use the helper that is already there any time.
+- **`Artur:` has to say yes before making or changing anything out there**,
+  because that part costs money.
+
+How it works is in the family notes on Artur's computer. Not in here.
+
+Anyone can read what goes on the shared notepad. So it is for game moves, not
+for anything private.
+
+---
+
+## Never put these in here
+
+Anyone in the world can read this repo, and everything that was ever in it.
+
+- **First names only.** Never a surname.
+- No school, no address, no town, no birthday, no age.
+- No email addresses. No phone numbers.
+- No photos of Adam or anyone he knows. Drawn pictures are fine.
+- No passwords. No keys. Nothing secret.
+
+If an idea needs one of those, it needs a different idea. Say so.
+
+---
+
+## Check before you finish
+
+- [ ] The folder is `projects/<small-letters-with-hyphens>/`
 - [ ] `index.html` starts with `<!doctype html>` and `<meta charset="utf-8">`
-- [ ] Everything is in that one file, and it runs when you open it
+- [ ] Everything is in that one file, and it works when you open it
 - [ ] `project.json` has `title`, `emoji` and `description`
-- [ ] The description is two plain sentences a child would understand
-- [ ] Nothing from the "must never" list above is anywhere in it
-- [ ] It works on a narrow phone-sized window
-- [ ] It went into the project you were actually asked about
-- [ ] It is committed **and pushed** — otherwise it is not on the website
+- [ ] The description is two easy sentences
+- [ ] Nothing from the "never" list is in it
+- [ ] It works in a narrow window
+- [ ] It went in the project Adam actually asked about
+- [ ] It is pushed — or Adam knows it is waiting
