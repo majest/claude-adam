@@ -230,6 +230,8 @@ details li{margin-bottom:5px}
   <section class="screen" id="s-title" data-on>
     <h1>Alien<br>Clash</h1>
     <p class="sub">Put aliens on the table and knock the other player down to nothing. Every alien is invented the moment you see it.</p>
+    <button class="btn big" id="resume" hidden>Back to your game</button>
+    <p class="tiny" id="resume-note" hidden></p>
     <div class="row">
       <button class="btn big" id="go-pass">One screen</button>
       <button class="btn big ghost" id="go-net">Two computers</button>
@@ -1306,7 +1308,8 @@ const G = {
   waiting: false,   // a move is out with the service and not back yet
   since: 0,
   poll: 0,
-  reading: false
+  reading: false,
+  rejoining: 0
 };
 const joined = [];
 
@@ -1455,9 +1458,27 @@ function readMoves(){
       if (!data || typeof data !== "object") return;
       if (typeof data.now === "number") G.since = data.now;
       const rows = Array.isArray(data.moves) ? data.moves : [];
+      const wasMuted = muted;
+      if (G.rejoining) muted = true;      // replaying a whole game would be a racket
       let got = 0;
       for (const row of rows){ if (intake(row)) got++; }
+      muted = wasMuted;
       if (got) G.waiting = false;
+      if (G.rejoining){
+        /* a read hands back at most 200 moves, so a long game arrives in
+           pieces. Keep asking until a short piece comes back. */
+        if (rows.length >= 200 && G.rejoining < 20){
+          G.rejoining++;
+          readMoves();
+          return;
+        }
+        G.rejoining = 0;
+        if (joined.indexOf(G.me) === -1){
+          /* the room has forgotten us, or never knew us, so come in fresh */
+          $("wait-note").textContent = "That game is gone. Starting a new one here.";
+          sendMove({ t: "join", id: G.me });
+        }
+      }
       if (G.started) render();
     })
     .catch(() => { G.reading = false; trouble("Lost the other computer for a moment."); });
@@ -1680,6 +1701,7 @@ function askPass(){
 
 function showOver(){
   stopReading();
+  forgetGame();                       // finished games are not worth coming back to
   const w = G.winner;
   $("over-title").textContent = w < 0 ? "A draw!"
     : (G.mode === "net" ? (w === G.seat ? "You win!" : "You lost")
@@ -1708,7 +1730,65 @@ $("go-net").addEventListener("click", () => {
   $("roomname").focus();
 });
 $("room-back").addEventListener("click", () => { SFX.tap(); show("s-title"); });
-$("wait-back").addEventListener("click", () => { SFX.tap(); stopReading(); show("s-title"); });
+$("wait-back").addEventListener("click", () => {
+  SFX.tap(); stopReading(); forgetGame(); refreshResume(); show("s-title");
+});
+$("resume").addEventListener("click", () => {
+  const kept = keptGame();
+  if (!kept){ refreshResume(); return; }
+  SFX.tap();
+  rejoinGame(kept.room, kept.me);
+});
+
+/* ---------- getting back into a game you left ----------
+   The whole game is rebuilt by replaying the moves in order, so coming back
+   needs only one thing remembered: which player you were. Read the room from
+   the start, replay everything, and you are exactly where you left off. This
+   is kept on your own computer and never sent anywhere. */
+const KEPT = "alien-clash-game";
+const KEPT_FOR = 55 * 60 * 1000;    // the rooms service forgets an hour after the last move
+
+function rememberGame(){
+  try { localStorage.setItem(KEPT, JSON.stringify({ room: G.room, me: G.me, at: Date.now() })); }
+  catch (e){}                       // a browser with storage switched off just cannot rejoin
+}
+function keptGame(){
+  try {
+    const raw = localStorage.getItem(KEPT);
+    if (!raw) return null;
+    const v = JSON.parse(raw);
+    if (!v || !v.room || !v.me || Date.now() - v.at > KEPT_FOR){ forgetGame(); return null; }
+    return v;
+  } catch (e){ return null; }
+}
+function forgetGame(){ try { localStorage.removeItem(KEPT); } catch (e){} }
+
+function refreshResume(){
+  const kept = keptGame();
+  const btn = $("resume"), note = $("resume-note");
+  if (!kept || location.protocol === "file:"){ btn.hidden = true; note.hidden = true; return; }
+  btn.hidden = false;
+  note.hidden = false;
+  note.textContent = "You were playing in " + kept.room + ".";
+}
+
+function rejoinGame(room, me){
+  G.mode = "net";
+  G.room = room;
+  G.me = me;
+  G.since = 0;                      // read the room from the very beginning
+  G.started = false;
+  G.waiting = false;
+  G.rejoining = 1;
+  joined.length = 0;
+  $("wait-room").textContent = room;
+  $("wait-note").textContent = "Getting your game back…";
+  drawJoinCode(room);
+  show("s-wait");
+  rememberGame();
+  readMoves();
+  startReading();
+}
 
 /* The square code holds the address of this very page with the room name on
    the end, so pointing a camera at it opens the game already in the room.
@@ -1751,6 +1831,7 @@ function joinRoom(room){
   $("wait-note").textContent = "Looking for them…";
   drawJoinCode(room);
   show("s-wait");
+  rememberGame();
   sendMove({ t: "join", id: G.me });
   startReading();
 }
@@ -1783,6 +1864,8 @@ $("pass-go").addEventListener("click", () => { SFX.tap(); show("s-game"); render
 $("again").addEventListener("click", () => {
   SFX.tap();
   stopReading();
+  forgetGame();
+  refreshResume();
   G.started = false;
   G.sides = null;
   show("s-title");
@@ -1796,7 +1879,14 @@ if (location.protocol === "file:"){
 } else {
   /* arrived by scanning the square code? the room name is in the address */
   const scanned = /[#&]r=([A-Za-z0-9-]{3,40})/.exec(location.hash || "");
-  if (scanned) joinRoom(tidyRoomName(scanned[1]));
+  const kept = keptGame();
+  if (scanned){
+    const room = tidyRoomName(scanned[1]);
+    if (kept && kept.room === room) rejoinGame(room, kept.me);   // back to your seat
+    else joinRoom(room);
+  } else {
+    refreshResume();
+  }
 }
 
 let resizeTimer;

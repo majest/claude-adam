@@ -72,6 +72,32 @@ including the real link and a 105-character one, were drawn and then read back
 with an independent decoder, and all seven came back byte for byte. The one on
 the waiting screen was then decoded straight off the rendered canvas.
 
+## Coming back to a game you left
+
+Close the tab, reload by accident, run out of battery: the title screen now
+offers **Back to your game** and puts you back exactly where you were.
+
+This costs almost nothing to do, because of how the two-computer play already
+works. The game is rebuilt by replaying the moves in order, so the only thing
+worth remembering is *which player you were*. That one id is kept on your own
+computer and never sent anywhere. Coming back means reading the room from the
+very beginning, replaying the lot, and carrying on.
+
+Three details that matter:
+
+- **The replay is silent.** Every move makes a noise, and replaying a whole
+  game would be a racket, so the sound is held down until it has caught up.
+- **A read hands back at most 200 moves**, so a long game comes back in
+  pieces. It keeps asking until a short piece arrives, rather than resuming a
+  game with a hole in the middle.
+- **If the room has forgotten you**, because more than an hour has passed or
+  it was never yours, it says so and comes in as a new player instead of
+  waiting for something that will never arrive.
+
+Checked by doing it: two tabs played a real exchange, one was fully reloaded
+and brought back, and the rebuilt game matched the other tab exactly, down to
+which alien had already had its go.
+
 ## Two computers, without either one being in charge
 
 Both pages build **the same decks from the room name**, so no cards are ever
