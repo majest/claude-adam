@@ -65,6 +65,19 @@ one, which is why it would live alongside.
 
 The painted portraits are done. All 48 are in `art/` and the cards use them.
 
+**Waiting on Artur: the faint scribble on a few of the robots.** Some of the
+painted robots have a tiny scrawl along the very bottom edge, where the picture
+maker copied the way an artist signs a painting. The rules for these pictures
+say no writing at all, so it should not be there. It is a few pixels tall, and
+the card cuts most of it off, so you have to look for it.
+
+Asking for those pictures again with a different number does not fix it. It
+moves the scrawl to a different picture, and twice it gave a robot a gun
+instead, which is worse. The fix is to shave a few pixels off every edge after
+a picture is made. That is a change to the machine that paints them, not to
+this game, so it needs Artur. **Recommended: shave the edges.** Until then the
+pictures are fine to use and nobody has spotted it while playing.
+
 ## Seeing every card
 
 After the cards are dealt the whole deck is laid out, boss first, so you can see
