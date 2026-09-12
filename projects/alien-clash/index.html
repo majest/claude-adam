@@ -1,0 +1,748 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Alien Clash</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Chakra+Petch:wght@500;600;700&display=swap">
+
+<style>
+:root{
+  --void:#120827;
+  --void-2:#1B0F3B;
+  --panel:#241553;
+  --panel-2:#2E1B66;
+  --edge:rgba(255,255,255,.14);
+  --ink:#F3EDFF;
+  --ink-2:#B4A6DC;
+  --ink-3:#8375B0;
+
+  --common:#8B9AB8;
+  --rare:#35C9EC;
+  --epic:#C455EE;
+  --legend:#F5B324;
+
+  --p1:#4ADE80;
+  --p2:#38BDF8;
+  --p3:#FB7185;
+  --p4:#FBBF24;
+
+  --win:#4ADE80;
+  --lose:#F2536B;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 700px at 78% -10%, #3A1C6E 0%, rgba(58,28,110,0) 60%),
+    radial-gradient(900px 600px at 8% 105%, #14306B 0%, rgba(20,48,107,0) 55%),
+    var(--void);
+  color:var(--ink);
+  font-family:"Chakra Petch",ui-sans-serif,system-ui,sans-serif;
+  font-weight:500;
+  -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;
+  overflow-x:hidden;
+}
+
+/* ---------- shell ---------- */
+#app{
+  min-height:100%;
+  display:flex;flex-direction:column;
+  padding:16px;
+  padding-top:max(16px, env(safe-area-inset-top));
+  padding-bottom:max(16px, env(safe-area-inset-bottom));
+  max-width:1000px;margin:0 auto;
+  gap:16px;
+}
+.screen{display:none;flex:1;flex-direction:column;gap:16px;align-items:center;justify-content:center}
+.screen[data-on]{display:flex}
+
+h1{
+  font-family:"Bungee",Impact,sans-serif;font-weight:400;
+  font-size:clamp(34px,10vw,68px);line-height:.95;margin:0;
+  text-align:center;letter-spacing:.01em;
+  background:linear-gradient(180deg,#FFF 0%,#C9A8FF 55%,#7B4BD8 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 18px rgba(150,90,255,.5));
+}
+h2{
+  font-family:"Bungee",Impact,sans-serif;font-weight:400;
+  font-size:clamp(19px,4.6vw,28px);margin:0;text-align:center;line-height:1.15;
+}
+.sub{
+  margin:0;text-align:center;color:var(--ink-2);
+  font-size:clamp(14px,3.6vw,17px);max-width:34ch;line-height:1.5;
+}
+.tiny{font-size:12.5px;color:var(--ink-3);text-align:center;margin:0;letter-spacing:.02em}
+
+/* ---------- buttons ---------- */
+.btn{
+  font-family:"Bungee",Impact,sans-serif;font-weight:400;
+  font-size:clamp(15px,4vw,19px);
+  min-height:56px;padding:14px 26px;
+  border:0;border-radius:14px;cursor:pointer;
+  background:linear-gradient(180deg,#8B5CF6,#6D28D9);
+  color:#fff;
+  box-shadow:0 5px 0 #4C1D95, 0 12px 24px rgba(0,0,0,.4);
+  transition:transform .08s, box-shadow .08s, filter .15s;
+  letter-spacing:.02em;
+}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #4C1D95, 0 6px 14px rgba(0,0,0,.4)}
+.btn.ghost{
+  background:rgba(255,255,255,.07);
+  box-shadow:0 3px 0 rgba(0,0,0,.35);
+  border:1px solid var(--edge);
+}
+.btn.big{font-size:clamp(17px,5vw,23px);min-height:66px;padding:16px 34px}
+.btn:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+
+/* ---------- player count ---------- */
+.count{display:flex;gap:10px}
+.count button{
+  font-family:"Bungee",Impact,sans-serif;
+  width:64px;height:72px;font-size:26px;
+  border-radius:14px;cursor:pointer;color:var(--ink);
+  background:rgba(255,255,255,.06);
+  border:2px solid var(--edge);
+  transition:all .15s;
+}
+.count button[aria-pressed="true"]{
+  background:linear-gradient(180deg,#8B5CF6,#6D28D9);
+  border-color:#C4A0FF;color:#fff;
+  box-shadow:0 0 0 4px rgba(139,92,246,.25);
+}
+.count button:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
+
+/* ---------- the card ---------- */
+.card{
+  --accent:var(--common);
+  width:100%;max-width:300px;
+  aspect-ratio:5/7;
+  border-radius:18px;
+  padding:9px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 26%, var(--panel)) 0%, var(--panel) 34%, var(--void-2) 100%);
+  border:2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.14);
+  display:flex;flex-direction:column;gap:7px;
+  position:relative;overflow:hidden;
+  flex:none;
+}
+.card.foil::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.30) 48%,transparent 62%);
+  background-size:280% 280%;
+  animation:sheen 3.6s linear infinite;
+}
+@keyframes sheen{from{background-position:140% 0}to{background-position:-60% 0}}
+
+.card-head{display:flex;align-items:center;gap:6px;padding:1px 3px 0}
+.card-name{
+  font-family:"Bungee",Impact,sans-serif;font-weight:400;
+  font-size:15px;line-height:1.1;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.pip{
+  font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 7px;border-radius:999px;flex:none;
+  background:color-mix(in srgb, var(--accent) 30%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  color:color-mix(in srgb, var(--accent) 65%, #fff);
+}
+.art{
+  width:100%;flex:1;min-height:0;display:block;
+  border-radius:12px;
+  background:#0A0518;
+  border:1px solid rgba(255,255,255,.1);
+}
+.card-species{
+  font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-2);text-align:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.stat{
+  display:flex;align-items:baseline;justify-content:space-between;gap:4px;
+  padding:5px 8px;border-radius:9px;
+  background:rgba(0,0,0,.32);
+  border:1px solid rgba(255,255,255,.09);
+  transition:all .2s;
+}
+.stat span{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.stat b{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.stat.on{
+  background:rgba(245,179,36,.2);
+  border-color:#F5B324;
+  box-shadow:0 0 0 2px rgba(245,179,36,.25);
+}
+.stat.on span{color:#FFE0A0}
+.card-flavour{
+  font-size:11px;line-height:1.3;color:var(--ink-3);
+  text-align:center;font-style:italic;min-height:1.3em;
+  overflow:hidden;
+}
+
+/* card backs + stacks */
+.card.back{
+  background:
+    repeating-linear-gradient(45deg,#2B1A5E 0 10px,#241553 10px 20px);
+  border-color:rgba(255,255,255,.18);
+  align-items:center;justify-content:center;
+}
+.card.back .glyph{font-size:44px;filter:drop-shadow(0 3px 10px rgba(0,0,0,.6))}
+
+/* ---------- pick screen ---------- */
+.pickwrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+.powers{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;max-width:340px}
+.power{
+  font-family:"Chakra Petch",sans-serif;font-weight:700;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-height:58px;padding:10px 14px;
+  border-radius:13px;cursor:pointer;color:var(--ink);
+  background:rgba(255,255,255,.07);
+  border:2px solid var(--edge);
+  box-shadow:0 3px 0 rgba(0,0,0,.35);
+  transition:all .12s;
+}
+.power em{font-style:normal;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+.power b{font-size:24px;font-variant-numeric:tabular-nums}
+.power:hover{background:rgba(139,92,246,.28);border-color:#A78BFA}
+.power:active{transform:translateY(3px);box-shadow:0 0 0 rgba(0,0,0,.35)}
+.power:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
+
+/* ---------- reveal ---------- */
+.arena{
+  display:grid;gap:10px;width:100%;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  justify-items:center;
+}
+@media (min-width:760px){ .arena{grid-template-columns:repeat(var(--cols,4),minmax(0,1fr))} }
+.slot{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-width:0}
+.slot .card{max-width:220px}
+.who{
+  font-family:"Bungee",Impact,sans-serif;font-size:12px;
+  padding:4px 10px;border-radius:999px;
+  background:color-mix(in srgb, var(--pc) 26%, transparent);
+  border:1px solid var(--pc);color:var(--pc);
+  white-space:nowrap;
+}
+.slot.won .card{
+  border-color:var(--win);
+  box-shadow:0 0 0 3px rgba(74,222,128,.35), 0 12px 34px rgba(74,222,128,.28);
+  transform:translateY(-5px) scale(1.02);
+}
+.slot.out{opacity:.55}
+.crown{font-size:20px;line-height:1}
+.crown[hidden]{display:none}
+
+/* ---------- scoreboard ---------- */
+.board{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:100%}
+.chip{
+  display:flex;align-items:center;gap:6px;
+  font-size:12.5px;font-weight:700;
+  padding:6px 11px;border-radius:999px;
+  background:rgba(0,0,0,.3);
+  border:1px solid color-mix(in srgb, var(--pc) 55%, transparent);
+  color:var(--ink);
+}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--pc);flex:none}
+.chip u{text-decoration:none;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.chip.lead{background:color-mix(in srgb, var(--pc) 22%, transparent)}
+.chip.dead{opacity:.4}
+
+.banner{
+  font-family:"Bungee",Impact,sans-serif;
+  font-size:clamp(16px,4.4vw,24px);text-align:center;
+  padding:10px 18px;border-radius:14px;
+  background:rgba(0,0,0,.35);border:1px solid var(--edge);
+  min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+
+/* ---------- rules ---------- */
+details{
+  width:100%;max-width:420px;
+  background:rgba(0,0,0,.28);border:1px solid var(--edge);border-radius:13px;
+}
+summary{
+  cursor:pointer;padding:13px 16px;font-weight:700;
+  font-size:14.5px;letter-spacing:.03em;list-style:none;
+}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-3)}
+details[open] summary::before{content:"▾ "}
+details ol{margin:0;padding:0 20px 15px 38px;color:var(--ink-2);font-size:14px;line-height:1.6}
+details li{margin-bottom:5px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  .card.foil::after{display:none}
+}
+</style>
+
+<div id="app">
+
+  <!-- ░░ TITLE ░░ -->
+  <section class="screen" id="s-title" data-on>
+    <h1>Alien<br>Clash</h1>
+    <p class="sub">Every card is an alien nobody has ever seen before. Flip, pick a power, and the biggest number takes the lot.</p>
+    <p class="tiny">How many of you are playing?</p>
+    <div class="count" id="count" role="group" aria-label="Number of players"></div>
+    <button class="btn big" id="start">Deal the cards</button>
+    <details>
+      <summary>How to play</summary>
+      <ol>
+        <li>Everyone gets a pile of alien cards, face down.</li>
+        <li>One player looks at their top card and picks a power: Power, Speed, Brains or Armour.</li>
+        <li>All the cards flip over at once.</li>
+        <li>Biggest number in that power wins every card on the table.</li>
+        <li>Same number twice? The cards wait in the middle and the next winner takes those too.</li>
+        <li>Run out of cards and you're out. Last one holding cards wins.</li>
+      </ol>
+    </details>
+    <p class="tiny">Pass the screen around. One phone or one computer is all you need.</p>
+  </section>
+
+  <!-- ░░ PASS ░░ -->
+  <section class="screen" id="s-pass">
+    <div class="card back" style="max-width:170px"><span class="glyph">👽</span></div>
+    <h2 id="pass-who">Player 1, it's your turn</h2>
+    <p class="sub" id="pass-note">Only you should see this card. Everyone else, look away!</p>
+    <button class="btn big" id="peek">See my alien</button>
+    <div class="board" id="pass-board"></div>
+  </section>
+
+  <!-- ░░ PICK ░░ -->
+  <section class="screen" id="s-pick">
+    <h2 id="pick-who">Player 1</h2>
+    <div class="pickwrap">
+      <div id="pick-card"></div>
+      <p class="tiny">Which power do you want to fight with?</p>
+      <div class="powers" id="powers"></div>
+    </div>
+  </section>
+
+  <!-- ░░ REVEAL ░░ -->
+  <section class="screen" id="s-reveal">
+    <div class="banner" id="verdict"></div>
+    <div class="arena" id="arena"></div>
+    <div class="board" id="reveal-board"></div>
+    <button class="btn big" id="next">Next round</button>
+  </section>
+
+  <!-- ░░ GAME OVER ░░ -->
+  <section class="screen" id="s-over">
+    <h1 id="over-title">Player 1<br>wins!</h1>
+    <div id="over-card"></div>
+    <p class="sub" id="over-note"></p>
+    <div class="board" id="over-board"></div>
+    <button class="btn big" id="again">Play again</button>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════
+   ALIEN CLASH
+   Every card is invented on the spot from a number (its seed),
+   so the same seed always makes the same alien.
+   ════════════════════════════════════════════════════════════ */
+
+const TAU = Math.PI * 2;
+
+/* ---------- dice that remember ---------- */
+function hash(s){
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+class Rng {
+  constructor(seed){ this.n = mulberry32(typeof seed === "number" ? seed : hash(String(seed))); }
+  f(a, b){ const v = this.n(); return a === undefined ? v : b === undefined ? v * a : a + v * (b - a); }
+  int(a, b){ return Math.floor(this.f(a, b + 1)); }
+  pick(arr){ return arr[Math.floor(this.n() * arr.length)]; }
+  chance(p){ return this.n() < p; }
+}
+
+const hsl  = (h, s, l) => "hsl(" + ((h % 360) + 360) % 360 + " " + s + "% " + l + "%)";
+const hsla = (h, s, l, a) => "hsl(" + ((h % 360) + 360) % 360 + " " + s + "% " + l + "% / " + a + ")";
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+
+/* ---------- alien words ---------- */
+const PRE = ["Zor","Blor","Gnar","Xel","Vex","Kru","Mog","Thra","Zib","Quor","Nog","Splo",
+             "Grik","Yaz","Dro","Pim","Wub","Klax","Orb","Snu","Grub","Vol","Zed","Nim"];
+const SUF = ["blax","nok","zoid","thor","gump","ax","ix","ulon","oid","gar","mite","zar",
+             "ith","ok","lop","und","een","arg","uss","ip"];
+
+const SPECIES = {
+  slime: {
+    hues: [95, 120, 145, 165, 285, 75],
+    names: ["Goo Hulk","Jelly Fiend","Ooze Lord","Slime Pup","Bog Blob","Mucus Beast","Drip Titan"],
+    flavour: ["Eats socks.","Leaves a trail everywhere.","Smells like old cheese.","Once ate a bus.",
+              "Afraid of bubbles.","Wobbles when it sneezes.","Sticks to the ceiling.","Tastes like lime. Sadly."]
+  },
+  mech: {
+    hues: [205, 220, 235, 25, 0, 190],
+    names: ["Rust Unit","Iron Sentry","Cog Drone","Steel Hunter","Bolt Titan","Scrap Warden","Gear Brute"],
+    flavour: ["Runs on very old batteries.","Beeps when it is happy.","Has 400 spare parts.",
+              "Forgot why it came here.","Hums much too loudly.","Goes rusty in the rain.",
+              "Counts everything twice.","Cannot open jars."]
+  },
+  bug: {
+    hues: [22, 38, 300, 330, 258, 50],
+    names: ["Hive Raider","Shell Knight","Spike Crawler","Wing Stalker","Carapax","Swarm Brute","Claw Scout"],
+    flavour: ["Has eleven knees.","Clicks all night long.","Can lift a car.","Sleeps upside down.",
+              "Collects shiny rocks.","Hates being tickled.","Walks on walls.","Is scared of moths."]
+  }
+};
+
+const RARITY = [
+  { key: "common", label: "Common",    odds: .55, budget: [95, 140],  foil: false },
+  { key: "rare",   label: "Rare",      odds: .27, budget: [140, 192], foil: false },
+  { key: "epic",   label: "Epic",      odds: .14, budget: [192, 248], foil: true  },
+  { key: "legend", label: "Legendary", odds: .04, budget: [248, 302], foil: true  }
+];
+
+const POWERS = [
+  { key: "power",  label: "Power"  },
+  { key: "speed",  label: "Speed"  },
+  { key: "brains", label: "Brains" },
+  { key: "armour", label: "Armour" }
+];
+
+/* ---------- inventing a card ---------- */
+function shareOut(r, lo, hi){
+  const total = r.int(lo, hi);
+  const w = [r.f(.3, 1), r.f(.3, 1), r.f(.3, 1), r.f(.3, 1)];
+  const sum = w[0] + w[1] + w[2] + w[3];
+  const v = w.map(x => clamp(Math.round(x / sum * total), 5, 99));
+  // nudge until the numbers add up, without breaking the 5..99 range
+  for (let guard = 0; guard < 400; guard++){
+    const diff = total - v.reduce((a, b) => a + b, 0);
+    if (diff === 0) break;
+    const i = r.int(0, 3), step = diff > 0 ? 1 : -1;
+    if (v[i] + step >= 5 && v[i] + step <= 99) v[i] += step;
+  }
+  return { power: v[0], speed: v[1], brains: v[2], armour: v[3] };
+}
+
+function makeCard(seed){
+  const r = new Rng("alien|" + seed);
+  const spKey = r.pick(["slime", "mech", "bug"]);
+  const sp = SPECIES[spKey];
+
+  let roll = r.f(), rarity = RARITY[0];
+  for (const R of RARITY){ if (roll < R.odds){ rarity = R; break; } roll -= R.odds; }
+
+  const hue = r.pick(sp.hues) + r.int(-12, 12);
+  return {
+    seed, spKey, rarity,
+    name: r.pick(PRE) + (r.chance(.35) ? r.pick(["a","o","u","ee","i"]) : "") + r.pick(SUF),
+    species: r.pick(sp.names),
+    flavour: r.pick(sp.flavour),
+    stats: shareOut(r, rarity.budget[0], rarity.budget[1]),
+    hue,
+    bg: hue + r.int(150, 210),
+    art: r.int(0, 1e9)
+  };
+}
+
+/* ════════════════════════════════════════════════════════════
+   DRAWING THE ALIEN
+   ════════════════════════════════════════════════════════════ */
+function blobPath(ctx, pts){
+  const n = pts.length;
+  ctx.beginPath();
+  ctx.moveTo((pts[n - 1][0] + pts[0][0]) / 2, (pts[n - 1][1] + pts[0][1]) / 2);
+  for (let i = 0; i < n; i++){
+    const p = pts[i], q = pts[(i + 1) % n];
+    ctx.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2);
+  }
+  ctx.closePath();
+}
+function roundBox(ctx, x, y, w, h, rad){
+  const k = Math.min(rad, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + k, y);
+  ctx.arcTo(x + w, y, x + w, y + h, k);
+  ctx.arcTo(x + w, y + h, x, y + h, k);
+  ctx.arcTo(x, y + h, x, y, k);
+  ctx.arcTo(x, y, x + w, y, k);
+  ctx.closePath();
+}
+function dot(ctx, x, y, rr){ ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill(); }
+
+function eye(ctx, x, y, rr, look){
+  ctx.fillStyle = "#F6F2FF"; dot(ctx, x, y, rr);
+  ctx.fillStyle = "rgba(20,10,35,.25)";
+  ctx.beginPath(); ctx.arc(x, y, rr, Math.PI * 1.05, Math.PI * 1.95); ctx.fill();
+  ctx.fillStyle = "#160C26"; dot(ctx, x + look * rr * .28, y + rr * .12, rr * .46);
+  ctx.fillStyle = "rgba(255,255,255,.95)"; dot(ctx, x - rr * .3, y - rr * .34, rr * .2);
+}
+
+/* ---------- background ---------- */
+function drawSpace(ctx, w, h, card, r){
+  const g = ctx.createLinearGradient(0, 0, w * .3, h);
+  g.addColorStop(0, hsl(card.bg, 48, 22));
+  g.addColorStop(.55, hsl(card.bg + 18, 52, 12));
+  g.addColorStop(1, hsl(card.bg + 34, 55, 6));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+
+  for (let i = 0; i < 3; i++){                        // nebula
+    const x = r.f(0, w), y = r.f(0, h * .8), rad = r.f(w * .25, w * .7);
+    const ng = ctx.createRadialGradient(x, y, 0, x, y, rad);
+    ng.addColorStop(0, hsla(card.hue + r.int(-40, 40), 70, 60, .17));
+    ng.addColorStop(1, hsla(card.hue, 70, 60, 0));
+    ctx.fillStyle = ng; ctx.fillRect(0, 0, w, h);
+  }
+  for (let i = 0; i < 44; i++){                       // stars
+    const s = r.chance(.14) ? 1.9 : 1;
+    ctx.fillStyle = "rgba(255,255,255," + r.f(.2, .85).toFixed(2) + ")";
+    ctx.fillRect(r.f(0, w), r.f(0, h * .95), s, s);
+  }
+  const floor = ctx.createRadialGradient(w / 2, h * 1.02, 0, w / 2, h * 1.02, w * .8);
+  floor.addColorStop(0, hsla(card.hue, 80, 55, .30));
+  floor.addColorStop(1, hsla(card.hue, 80, 55, 0));
+  ctx.fillStyle = floor; ctx.fillRect(0, h * .45, w, h * .55);
+}
+
+/* ---------- slime ---------- */
+function drawSlime(ctx, cx, cy, u, r, card){
+  const H = card.hue, R = u * .33;
+
+  for (let i = 0; i < r.int(2, 4); i++){              // drips, behind the body
+    const a = r.f(.15, .85) * Math.PI, dx = cx + Math.cos(a) * R * .85,
+          dy = cy + Math.abs(Math.sin(a)) * R * .8, dr = u * r.f(.04, .085);
+    ctx.fillStyle = hsl(H, 62, 38);
+    dot(ctx, dx, dy + dr * 1.6, dr);
+    ctx.fillRect(dx - dr * .45, dy - dr, dr * .9, dr * 2.2);
+  }
+
+  const pts = [], n = 15;
+  for (let i = 0; i < n; i++){
+    const a = i / n * TAU;
+    const rad = R * (1 + r.f(-.13, .13) + Math.sin(a * 3 + card.art) * .06);
+    pts.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad * 1.06]);
+  }
+  blobPath(ctx, pts);
+  const bg = ctx.createRadialGradient(cx - R * .35, cy - R * .45, R * .1, cx, cy, R * 1.25);
+  bg.addColorStop(0, hsl(H, 72, 62));
+  bg.addColorStop(.6, hsl(H, 66, 45));
+  bg.addColorStop(1, hsl(H, 62, 28));
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.strokeStyle = hsla(H, 85, 76, .55); ctx.lineWidth = u * .012; ctx.stroke();
+
+  ctx.save(); blobPath(ctx, pts); ctx.clip();
+  for (let i = 0; i < r.int(3, 7); i++){              // spots
+    ctx.fillStyle = hsla(H + r.int(-25, 25), 60, 32, .5);
+    dot(ctx, cx + r.f(-R, R), cy + r.f(-R, R), u * r.f(.025, .06));
+  }
+  ctx.fillStyle = "rgba(255,255,255,.22)";
+  ctx.beginPath();
+  ctx.ellipse(cx - R * .38, cy - R * .5, R * .3, R * .17, -.6, 0, TAU); ctx.fill();
+  ctx.restore();
+
+  const eyes = r.int(1, 5), look = r.chance(.5) ? 1 : -1;
+  for (let i = 0; i < eyes; i++){
+    const t = eyes === 1 ? .5 : i / (eyes - 1);
+    const ex = cx + (t - .5) * R * 1.25 + r.f(-R * .08, R * .08);
+    const ey = cy - R * r.f(.15, .5);
+    const er = u * (eyes > 3 ? .045 : .07) * r.f(.85, 1.15);
+    if (r.chance(.3)){                                 // on a stalk
+      const sy = ey - R * r.f(.55, .95);
+      ctx.strokeStyle = hsl(H, 66, 42); ctx.lineWidth = er * .5; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex, sy); ctx.stroke();
+      eye(ctx, ex, sy, er, look);
+    } else eye(ctx, ex, ey, er, look);
+  }
+
+  const my = cy + R * .42, mw = R * r.f(.4, .7);       // grin
+  ctx.strokeStyle = "#180D28"; ctx.lineWidth = u * .018; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.arc(cx, my - mw * .35, mw, .25 * Math.PI, .75 * Math.PI); ctx.stroke();
+  if (r.chance(.6)){
+    ctx.fillStyle = "#F6F2FF";
+    for (let i = 0; i < 3; i++){
+      const fx = cx + (i - 1) * mw * .5;
+      ctx.beginPath(); ctx.moveTo(fx - mw * .1, my + mw * .05);
+      ctx.lineTo(fx + mw * .1, my + mw * .05); ctx.lineTo(fx, my + mw * .3); ctx.fill();
+    }
+  }
+}
+
+/* ---------- mech ---------- */
+function drawMech(ctx, cx, cy, u, r, card){
+  const H = card.hue, W = u * .5, Hh = u * .44;
+  const plate = (x, y, w, h, rad, lit) => {
+    roundBox(ctx, x, y, w, h, rad);
+    const g = ctx.createLinearGradient(x, y, x, y + h);
+    g.addColorStop(0, hsl(H, 22, lit ? 66 : 52));
+    g.addColorStop(.5, hsl(H, 26, lit ? 48 : 36));
+    g.addColorStop(1, hsl(H, 30, lit ? 34 : 24));
+    ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = hsla(H, 40, 82, .4); ctx.lineWidth = u * .008; ctx.stroke();
+  };
+
+  for (let i = 0; i < r.int(1, 3); i++){               // antennae
+    const ax = cx + (i ? 1 : -1) * W * r.f(.2, .4), ay = cy - Hh * .5;
+    const tx = ax + r.f(-u * .08, u * .08), ty = ay - u * r.f(.14, .26);
+    ctx.strokeStyle = hsl(H, 20, 55); ctx.lineWidth = u * .016; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.fillStyle = hsl(H + 40, 95, 66); dot(ctx, tx, ty, u * .028);
+    ctx.fillStyle = hsla(H + 40, 95, 66, .4); dot(ctx, tx, ty, u * .055);
+    if (r.int(1, 3) === 1) break;
+  }
+
+  plate(cx - W * .82, cy + Hh * .26, W * 1.64, Hh * .52, u * .05, false);   // shoulders
+  for (const s of [-1, 1]){                                                 // claw arms
+    const ax = cx + s * W * .86;
+    ctx.strokeStyle = hsl(H, 24, 40); ctx.lineWidth = u * .034; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(ax, cy + Hh * .42); ctx.lineTo(ax + s * u * .1, cy + Hh * .82); ctx.stroke();
+    ctx.fillStyle = hsl(H, 24, 52);
+    dot(ctx, ax + s * u * .1, cy + Hh * .84, u * .035);
+  }
+  plate(cx - W / 2, cy - Hh / 2, W, Hh, u * .06, true);                     // head
+
+  const vw = W * .78, vh = Hh * .3, vx = cx - vw / 2, vy = cy - Hh * .1;    // visor
+  roundBox(ctx, vx, vy, vw, vh, u * .025);
+  ctx.fillStyle = "#0A0714"; ctx.fill();
+  ctx.strokeStyle = hsla(H, 40, 70, .5); ctx.lineWidth = u * .007; ctx.stroke();
+
+  const lenses = r.int(1, 3);
+  ctx.save(); roundBox(ctx, vx, vy, vw, vh, u * .025); ctx.clip();
+  for (let i = 0; i < lenses; i++){
+    const lx = vx + vw * ((i + 1) / (lenses + 1)), ly = vy + vh / 2;
+    ctx.fillStyle = hsl(H + 45, 95, 70); dot(ctx, lx, ly, vh * .3);
+    ctx.fillStyle = hsla(H + 45, 95, 70, .35); dot(ctx, lx, ly, vh * .62);
+    ctx.fillStyle = "#fff"; dot(ctx, lx - vh * .1, ly - vh * .1, vh * .09);
+  }
+  ctx.restore();
+
+  ctx.fillStyle = hsla(H, 35, 85, .35);                                     // rivets
+  for (let i = 0; i < 6; i++){
+    const side = i % 2 ? 1 : -1;
+    dot(ctx, cx + side * W * .42, cy - Hh * .34 + Math.floor(i / 2) * Hh * .24, u * .011);
+  }
+  ctx.strokeStyle = hsla(H, 30, 12, .6); ctx.lineWidth = u * .01;           // vents
+  for (let i = 0; i < 3; i++){
+    const gy = cy + Hh * (.22 + i * .07);
+    ctx.beginPath(); ctx.moveTo(cx - W * .26, gy); ctx.lineTo(cx + W * .26, gy); ctx.stroke();
+  }
+}
+
+/* ---------- bug ---------- */
+function drawBug(ctx, cx, cy, u, r, card){
+  const H = card.hue, bw = u * .3, bh = u * .36;
+
+  if (r.chance(.55)){                                  // wings
+    for (const s of [-1, 1]){
+      ctx.save();
+      ctx.translate(cx, cy - bh * .1); ctx.rotate(s * r.f(.35, .6));
+      ctx.fillStyle = hsla(H + 30, 80, 78, .3);
+      ctx.beginPath(); ctx.ellipse(s * bw * 1.15, 0, bw * 1.15, bh * .42, 0, 0, TAU); ctx.fill();
+      ctx.strokeStyle = hsla(H + 30, 70, 88, .5); ctx.lineWidth = u * .007; ctx.stroke();
+      ctx.restore();
+    }
+  }
+  for (const s of [-1, 1]){                            // legs
+    for (let i = 0; i < 3; i++){
+      const hy = cy - bh * .25 + i * bh * .36;
+      const kx = cx + s * bw * r.f(1.25, 1.6), ky = hy + bh * r.f(.1, .3);
+      const fx = kx + s * bw * r.f(.25, .5), fy = ky + bh * r.f(.35, .6);
+      ctx.strokeStyle = hsl(H, 55, 30); ctx.lineWidth = u * .017; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(cx + s * bw * .6, hy); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
+    }
+  }
+
+  ctx.beginPath();                                     // shell
+  ctx.ellipse(cx, cy + bh * .18, bw, bh * .92, 0, 0, TAU);
+  const sg = ctx.createLinearGradient(cx - bw, cy - bh, cx + bw, cy + bh);
+  sg.addColorStop(0, hsl(H, 70, 58));
+  sg.addColorStop(.5, hsl(H, 68, 40));
+  sg.addColorStop(1, hsl(H, 65, 24));
+  ctx.fillStyle = sg; ctx.fill();
+  ctx.strokeStyle = hsla(H, 80, 74, .45); ctx.lineWidth = u * .01; ctx.stroke();
+
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(cx, cy + bh * .18, bw, bh * .92, 0, 0, TAU); ctx.clip();
+  ctx.strokeStyle = hsla(H, 60, 18, .55); ctx.lineWidth = u * .012;
+  for (let i = 1; i < 4; i++){
+    const gy = cy - bh * .25 + i * bh * .38;
+    ctx.beginPath(); ctx.moveTo(cx - bw, gy); ctx.quadraticCurveTo(cx, gy + bh * .12, cx + bw, gy); ctx.stroke();
+  }
+  ctx.fillStyle = "rgba(255,255,255,.2)";
+  ctx.beginPath(); ctx.ellipse(cx - bw * .35, cy - bh * .3, bw * .3, bh * .2, -.5, 0, TAU); ctx.fill();
+  ctx.restore();
+
+  if (r.chance(.6)){                                   // back spikes
+    ctx.fillStyle = hsl(H, 45, 78);
+    for (let i = 0; i < 4; i++){
+      const sy = cy - bh * .3 + i * bh * .3, sw = u * .03;
+      ctx.beginPath();
+      ctx.moveTo(cx - bw * .95, sy - sw); ctx.lineTo(cx - bw * 1.3, sy);
+      ctx.lineTo(cx - bw * .95, sy + sw); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cx + bw * .95, sy - sw); ctx.lineTo(cx + bw * 1.3, sy);
+      ctx.lineTo(cx + bw * .95, sy + sw); ctx.fill();
+    }
+  }
+
+  const hy = cy - bh * .82, hr = bw * .62;             // head
+  ctx.beginPath(); ctx.ellipse(cx, hy, hr, hr * .8, 0, 0, TAU);
+  ctx.fillStyle = hsl(H, 62, 34); ctx.fill();
+  ctx.strokeStyle = hsla(H, 80, 70, .4); ctx.lineWidth = u * .008; ctx.stroke();
+
+  ctx.strokeStyle = hsl(H, 50, 24); ctx.lineWidth = u * .014; ctx.lineCap = "round";
+  for (const s of [-1, 1]){                            // mandibles
+    ctx.beginPath();
+    ctx.moveTo(cx + s * hr * .4, hy + hr * .5);
+    ctx.quadraticCurveTo(cx + s * hr * .9, hy + hr * .9, cx + s * hr * .3, hy + hr * 1.15);
+    ctx.stroke();
+  }
+  for (const s of [-1, 1]){                            // compound eyes
+    const ex = cx + s * hr * .45, ey = hy - hr * .12, er = hr * .3;
+    ctx.fillStyle = "#120A1E"; dot(ctx, ex, ey, er);
+    ctx.fillStyle = hsla(H + 50, 95, 66, .9);
+    for (let i = 0; i < 7; i++){
+      const a = i / 7 * TAU;
+      dot(ctx, ex + Math.cos(a) * er * .45, ey + Math.sin(a) * er * .45, er * .2);
+    }
+    ctx.fillStyle = "rgba(255,255,255,.85)"; dot(ctx, ex - er * .3, ey - er * .35, er * .16);
+  }
+  ctx.strokeStyle = hsl(H, 55, 40); ctx.lineWidth = u * .012;   // feelers
+  for (const s of [-1, 1]){
+    ctx.beginPath();
+    ctx.moveTo(cx + s * hr * .3, hy - hr * .6);
+    ctx.quadraticCurveTo(cx + s * hr * 1.1, hy - hr * 1.4, cx + s * hr * .5, hy - hr * 1.9);
+    ctx.stroke();
+  }
+}
+
+const ARTIST = { slime: drawSlime, mech: drawMech, bug: drawBug };
+
+function paintCard(canvas, card){
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const r = new Rng("art|" + card.art);
+  drawSpace(ctx, w, h, card, r);
+  ARTIST[card.spKey](ctx, w / 2, h * .54, Math.min(w, h) * 1.12, r, card);
+}
+</script>
