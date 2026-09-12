@@ -162,8 +162,8 @@ a picture is made. That is a change to the machine that paints them, not to
 this game, so it needs Artur. **Recommended: shave the edges.** Until then the
 pictures are fine to use and nobody has spotted it while playing.
 
-**Adam asked for "full multiplayer"** and it is not clear what he means. It
-could be more than two players, which is a real rules change: whose turn it is,
-who you are allowed to hit, and what happens when one player is knocked out.
-Or it could be a proper lobby showing who has joined. He needs to say which
-before it gets built, so nothing has been started.
+**Asked and answered: "full multiplayer" meant two computers**, which is
+built. Adam was asked whether he wanted three or four players in one game, a
+list of games to join, or just the two-computer play he already has, and he
+said the last. More than two players is a real rules change, so it is worth
+asking again rather than assuming, if it ever comes up.
