@@ -10,6 +10,29 @@ Hello Adam! You can read this. It says how everything works.
 
 ---
 
+## The other instruction files
+
+**This file first.** It has everything you need to make a project here.
+
+Next to it:
+
+- **`AI-TOOLBOX.md`** — every AI thing you can use, with code to copy. Look
+  here before building anything clever.
+- **`README.md`** — a short list of what is in this repo.
+- Each project can have its own `README.md` inside its folder, if it needs one.
+
+Above it, on Artur's computer:
+
+- **The family notes.** One folder up from this repo. They explain how the
+  website, the computer at home and the game helper fit together. They are not
+  in this repo because anyone can read this repo.
+
+You get the family notes automatically when you work on Artur's computer. **If
+you don't have them, you are working from a copy somewhere else.** Say so —
+don't guess what they said.
+
+---
+
 ## Talking to Adam
 
 **Adam is 8.** How you talk to him matters as much as the code you write.
