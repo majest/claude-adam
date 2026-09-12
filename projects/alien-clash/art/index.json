@@ -1,0 +1,254 @@
+{
+  "kind": "images",
+  "generated": "2026-09-12T13:32:37+0000",
+  "items": [
+    {
+      "id": "bug-01",
+      "file": "bug-01.webp"
+    },
+    {
+      "id": "bug-02",
+      "file": "bug-02.webp"
+    },
+    {
+      "id": "bug-03",
+      "file": "bug-03.webp"
+    },
+    {
+      "id": "bug-04",
+      "file": "bug-04.webp"
+    },
+    {
+      "id": "bug-05",
+      "file": "bug-05.webp"
+    },
+    {
+      "id": "bug-06",
+      "file": "bug-06.webp"
+    },
+    {
+      "id": "bug-07",
+      "file": "bug-07.webp"
+    },
+    {
+      "id": "bug-08",
+      "file": "bug-08.webp"
+    },
+    {
+      "id": "bug-09",
+      "file": "bug-09.webp"
+    },
+    {
+      "id": "bug-10",
+      "file": "bug-10.webp"
+    },
+    {
+      "id": "bug-11",
+      "file": "bug-11.webp"
+    },
+    {
+      "id": "bug-12",
+      "file": "bug-12.webp"
+    },
+    {
+      "id": "bug-13",
+      "file": "bug-13.webp"
+    },
+    {
+      "id": "bug-14",
+      "file": "bug-14.webp"
+    },
+    {
+      "id": "bug-15",
+      "file": "bug-15.webp"
+    },
+    {
+      "id": "bug-16",
+      "file": "bug-16.webp"
+    },
+    {
+      "id": "mech-01",
+      "file": "mech-01.webp"
+    },
+    {
+      "id": "mech-02",
+      "file": "mech-02.webp"
+    },
+    {
+      "id": "mech-03",
+      "file": "mech-03.webp"
+    },
+    {
+      "id": "mech-04",
+      "file": "mech-04.webp"
+    },
+    {
+      "id": "mech-05",
+      "file": "mech-05.webp"
+    },
+    {
+      "id": "mech-06",
+      "file": "mech-06.webp"
+    },
+    {
+      "id": "mech-07",
+      "file": "mech-07.webp"
+    },
+    {
+      "id": "mech-08",
+      "file": "mech-08.webp"
+    },
+    {
+      "id": "mech-09",
+      "file": "mech-09.webp"
+    },
+    {
+      "id": "mech-10",
+      "file": "mech-10.webp"
+    },
+    {
+      "id": "mech-11",
+      "file": "mech-11.webp"
+    },
+    {
+      "id": "mech-12",
+      "file": "mech-12.webp"
+    },
+    {
+      "id": "mech-13",
+      "file": "mech-13.webp"
+    },
+    {
+      "id": "mech-14",
+      "file": "mech-14.webp"
+    },
+    {
+      "id": "mech-15",
+      "file": "mech-15.webp"
+    },
+    {
+      "id": "mech-16",
+      "file": "mech-16.webp"
+    },
+    {
+      "id": "slime-01",
+      "file": "slime-01.webp"
+    },
+    {
+      "id": "slime-02",
+      "file": "slime-02.webp"
+    },
+    {
+      "id": "slime-03",
+      "file": "slime-03.webp"
+    },
+    {
+      "id": "slime-04",
+      "file": "slime-04.webp"
+    },
+    {
+      "id": "slime-05",
+      "file": "slime-05.webp"
+    },
+    {
+      "id": "slime-06",
+      "file": "slime-06.webp"
+    },
+    {
+      "id": "slime-07",
+      "file": "slime-07.webp"
+    },
+    {
+      "id": "slime-08",
+      "file": "slime-08.webp"
+    },
+    {
+      "id": "slime-09",
+      "file": "slime-09.webp"
+    },
+    {
+      "id": "slime-10",
+      "file": "slime-10.webp"
+    },
+    {
+      "id": "slime-11",
+      "file": "slime-11.webp"
+    },
+    {
+      "id": "slime-12",
+      "file": "slime-12.webp"
+    },
+    {
+      "id": "slime-13",
+      "file": "slime-13.webp"
+    },
+    {
+      "id": "slime-14",
+      "file": "slime-14.webp"
+    },
+    {
+      "id": "slime-15",
+      "file": "slime-15.webp"
+    },
+    {
+      "id": "slime-16",
+      "file": "slime-16.webp"
+    }
+  ],
+  "groups": {
+    "bug": [
+      "bug-01.webp",
+      "bug-02.webp",
+      "bug-03.webp",
+      "bug-04.webp",
+      "bug-05.webp",
+      "bug-06.webp",
+      "bug-07.webp",
+      "bug-08.webp",
+      "bug-09.webp",
+      "bug-10.webp",
+      "bug-11.webp",
+      "bug-12.webp",
+      "bug-13.webp",
+      "bug-14.webp",
+      "bug-15.webp",
+      "bug-16.webp"
+    ],
+    "mech": [
+      "mech-01.webp",
+      "mech-02.webp",
+      "mech-03.webp",
+      "mech-04.webp",
+      "mech-05.webp",
+      "mech-06.webp",
+      "mech-07.webp",
+      "mech-08.webp",
+      "mech-09.webp",
+      "mech-10.webp",
+      "mech-11.webp",
+      "mech-12.webp",
+      "mech-13.webp",
+      "mech-14.webp",
+      "mech-15.webp",
+      "mech-16.webp"
+    ],
+    "slime": [
+      "slime-01.webp",
+      "slime-02.webp",
+      "slime-03.webp",
+      "slime-04.webp",
+      "slime-05.webp",
+      "slime-06.webp",
+      "slime-07.webp",
+      "slime-08.webp",
+      "slime-09.webp",
+      "slime-10.webp",
+      "slime-11.webp",
+      "slime-12.webp",
+      "slime-13.webp",
+      "slime-14.webp",
+      "slime-15.webp",
+      "slime-16.webp"
+    ]
+  }
+}

@@ -27,9 +27,10 @@ same alien, which is why the artwork and the name and the stats always match.
 - **Three families.** Slimes are wobbly blobs with drips and eyes on stalks.
   Mechs are metal plates with a visor, a grille and antennae. Bugs have a
   segmented shell, jointed legs, mandibles and see-through wings.
-- **Nothing is a picture file.** Every alien is drawn with code onto a canvas,
-  along with its own starfield and nebula. That is why the game weighs almost
-  nothing and works with no internet.
+- **Every alien can be drawn with code**, onto a canvas, along with its own
+  starfield and nebula — no picture file needed. That is still what happens for
+  anything the painted set does not cover, and it is why the game works with no
+  internet at all.
 - **Rarity** runs Common, Rare, Epic, Legendary. Rarer cards get a bigger pile
   of points to share between their four powers, and Epic and above shimmer.
 - **One boss** hides in every single deck. Gold frame, scary name, huge numbers.
@@ -62,22 +63,26 @@ each turn, creatures placed on a board that fight, and a health total that ends
 the game when it reaches zero. That is a new game rather than a change to this
 one, which is why it would live alongside.
 
-Also waiting: the painted portraits in `art/PROMPTS.md`. They need a session on
-Artur's own computer, because the machine that paints them is not reachable
-from anywhere else, and Artur has to agree to the size first.
+The painted portraits are done. All 48 are in `art/` and the cards use them.
 
 ## Seeing every card
 
 After the cards are dealt the whole deck is laid out, boss first, so you can see
 what is in play before anyone takes a turn. Tap **Start playing** to begin.
 
-## Painted portraits from the AI machine
+## Painted portraits
 
-Aliens are drawn in code, which is why they are cartoons rather than paintings.
-If the machine at home paints real portraits into `art/` with an `index.json`
-listing them, each card shows a painting instead and falls back to the drawn
-alien for any family that has none. The full spec and the prompts are in
-`art/PROMPTS.md`.
+Every card shows a painted portrait, 48 of them, made on the machine at home
+and saved into `art/`. The card picks one from its own family.
+
+The drawn aliens are still there underneath. `art/index.json` lists what
+exists, and any family with an empty list goes back to being drawn in code — so
+deleting the pictures breaks nothing. Served from a file rather than a web
+address, the game skips the lookup and draws everything, exactly as it did
+before the pictures existed.
+
+What they had to look like, what is in the request, and the one thing that is
+not perfect about them are all in `art/PROMPTS.md`.
 
 ## Extra words from the AI machine
 

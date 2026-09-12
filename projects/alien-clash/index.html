@@ -1431,10 +1431,13 @@ function drawCover(ctx, img, w, h){
     .then(res => res.ok ? res.json() : null)
     .then(d => {
       if (!d || typeof d !== "object") return;
+      /* the machine writes the three lists inside "groups"; a hand-written
+         index may put them at the top level instead, so accept either */
+      const lists = (d.groups && typeof d.groups === "object") ? d.groups : d;
       let total = 0;
       ["slime", "mech", "bug"].forEach(k => {
-        if (Array.isArray(d[k])){
-          ART.sets[k] = d[k].filter(x => typeof x === "string" && /^[\w-]+\.(png|jpg|jpeg|webp)$/.test(x)).slice(0, 64);
+        if (Array.isArray(lists[k])){
+          ART.sets[k] = lists[k].filter(x => typeof x === "string" && /^[\w-]+\.(png|jpg|jpeg|webp)$/.test(x)).slice(0, 64);
           total += ART.sets[k].length;
         }
       });

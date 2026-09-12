@@ -4,298 +4,299 @@
   "defaults": {
     "size": 512,
     "steps": 4,
-    "guidance": 0,
     "format": "webp",
-    "quality": 80
+    "quality": 80,
+    "guidance": 1.5,
+    "negative": "signature, watermark, text, letters, logo, weapon, gun, rifle, sword, blade"
   },
   "items": [
     {
       "id": "slime-01",
       "group": "slime",
       "seed": 1000,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, lime green, one huge eye, smooth glossy, wide and squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, lime green, one huge eye, smooth glossy, wide and squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-02",
       "group": "slime",
       "seed": 1001,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, teal, five small eyes on stalks, bubbly, tall and thin, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, teal, five small eyes on stalks, bubbly, tall and thin, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-03",
       "group": "slime",
       "seed": 1002,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, violet, three eyes at different heights, smooth, tall and thin, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, violet, three eyes at different heights, smooth, tall and thin, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-04",
       "group": "slime",
       "seed": 1003,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, honey amber, two eyes on stalks, thick drips, wide and squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, honey amber, two eyes on stalks, thick drips, wide and squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-05",
       "group": "slime",
       "seed": 1004,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, coral pink, one eye, bubbly, round and squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, coral pink, one eye, bubbly, round and squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-06",
       "group": "slime",
       "seed": 1005,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, lime green, four eyes on the body, smooth, tall and thin, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, lime green, four eyes on the body, smooth, tall and thin, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-07",
       "group": "slime",
       "seed": 1006,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, teal blue, one huge eye on a stalk, glossy, wide and squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, teal blue, one huge eye on a stalk, glossy, wide and squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-08",
       "group": "slime",
       "seed": 1007,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, violet magenta, five eyes on the body, bubbly, wide and squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, violet magenta, five eyes on the body, bubbly, wide and squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-09",
       "group": "slime",
       "seed": 1008,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, amber gold, three eyes on long stalks, smooth, tall and thin, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, amber gold, three eyes on long stalks, smooth, tall and thin, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-10",
       "group": "slime",
       "seed": 1009,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, coral, two eyes, bubbly froth, squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, coral, two eyes, bubbly froth, squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-11",
       "group": "slime",
       "seed": 1010,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, pale mint green, six tiny eyes, smooth, tall and thin, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, pale mint green, six tiny eyes, smooth, tall and thin, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-12",
       "group": "slime",
       "seed": 1011,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, deep teal, one eye, heavy drips, wide and squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, deep teal, one eye, heavy drips, wide and squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-13",
       "group": "slime",
       "seed": 1012,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, electric violet, four eyes on stalks, bubbly, tall and thin, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, electric violet, four eyes on stalks, bubbly, tall and thin, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-14",
       "group": "slime",
       "seed": 1013,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, golden amber, two big eyes, smooth glossy, squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, golden amber, two big eyes, smooth glossy, squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-15",
       "group": "slime",
       "seed": 1014,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, salmon coral, three eyes on the body, bubbly, tall, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, salmon coral, three eyes on the body, bubbly, tall, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "slime-16",
       "group": "slime",
       "seed": 1015,
-      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, acid lime, five eyes on stalks, dripping, wide and squat, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly gelatinous alien blob, translucent glowing body, cartoon eyes, dripping goo, wide grin, acid lime, five eyes on stalks, dripping, wide and squat, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-01",
       "group": "mech",
       "seed": 1016,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one wide lens, brushed steel, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one wide lens, brushed steel, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-02",
       "group": "mech",
       "seed": 1017,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three round lenses, rusty orange, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three round lenses, rusty orange, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-03",
       "group": "mech",
-      "seed": 1018,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, white enamel, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "seed": 2418,
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, white enamel, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-04",
       "group": "mech",
       "seed": 1019,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, gunmetal blue, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, gunmetal blue, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-05",
       "group": "mech",
       "seed": 1020,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one narrow visor slit, rusty orange, chunky, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one narrow visor slit, rusty orange, chunky, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-06",
       "group": "mech",
       "seed": 1021,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, brushed steel, tall and thin, one antenna, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, brushed steel, tall and thin, one antenna, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-07",
       "group": "mech",
       "seed": 1022,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, rusty orange, tall and thin, one antenna, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, rusty orange, tall and thin, one antenna, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-08",
       "group": "mech",
       "seed": 1023,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, white enamel, chunky and heavy, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, white enamel, chunky and heavy, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-09",
       "group": "mech",
       "seed": 1024,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one glowing lens, gunmetal blue, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one glowing lens, gunmetal blue, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-10",
       "group": "mech",
       "seed": 1025,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three small lenses, brushed steel, chunky, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three small lenses, brushed steel, chunky, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-11",
       "group": "mech",
       "seed": 1026,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, white enamel, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, white enamel, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-12",
       "group": "mech",
-      "seed": 1027,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, rusty orange, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "seed": 1727,
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, rusty orange, chunky and heavy, one antenna, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-13",
       "group": "mech",
       "seed": 1028,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, gunmetal blue, chunky and heavy, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, gunmetal blue, chunky and heavy, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-14",
       "group": "mech",
       "seed": 1029,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, white enamel, tall and thin, one antenna, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, white enamel, tall and thin, one antenna, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-15",
       "group": "mech",
       "seed": 1030,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, brushed steel, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, one lens, brushed steel, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "mech-16",
       "group": "mech",
       "seed": 1031,
-      "prompt": "A boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, gunmetal blue, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A friendly boxy alien robot, heavy bevelled armour plates, dark glowing visor, vent grille mouth, antennae, weathered paint, three lenses, gunmetal blue, tall and thin, many antennae, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-01",
       "group": "bug",
       "seed": 1032,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, wings folded, long feelers, spiked back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, wings folded, long feelers, spiked back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-02",
       "group": "bug",
       "seed": 1033,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, wings spread open, short feelers, smooth back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, wings spread open, short feelers, smooth back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-03",
       "group": "bug",
       "seed": 1034,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, no wings, long feelers, heavy spikes, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, no wings, long feelers, heavy spikes, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-04",
       "group": "bug",
       "seed": 1035,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, wings folded, short feelers, small spikes, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, wings folded, short feelers, small spikes, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-05",
       "group": "bug",
       "seed": 1036,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, wings spread open, short feelers, spiked back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, wings spread open, short feelers, spiked back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-06",
       "group": "bug",
       "seed": 1037,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, no wings, long feelers, smooth back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, no wings, long feelers, smooth back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-07",
       "group": "bug",
       "seed": 1038,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, wings folded, short feelers, spiked back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, wings folded, short feelers, spiked back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-08",
       "group": "bug",
       "seed": 1039,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, wings spread open, long feelers, smooth back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, wings spread open, long feelers, smooth back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-09",
       "group": "bug",
       "seed": 1040,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, no wings, short feelers, heavy spikes, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, no wings, short feelers, heavy spikes, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-10",
       "group": "bug",
       "seed": 1041,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, wings folded, long feelers, spiked back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, wings folded, long feelers, spiked back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-11",
       "group": "bug",
       "seed": 1042,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, wings spread open, long feelers, smooth back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, wings spread open, long feelers, smooth back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-12",
       "group": "bug",
       "seed": 1043,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, no wings, short feelers, spiked back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, no wings, short feelers, spiked back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-13",
       "group": "bug",
       "seed": 1044,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, wings folded, short feelers, smooth back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, emerald shell, wings folded, short feelers, smooth back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-14",
       "group": "bug",
       "seed": 1045,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, wings spread open, long feelers, heavy spikes, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, bronze shell, wings spread open, long feelers, heavy spikes, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-15",
       "group": "bug",
       "seed": 1046,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, no wings, short feelers, smooth back, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, violet shell, no wings, short feelers, smooth back, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     },
     {
       "id": "bug-16",
       "group": "bug",
       "seed": 1047,
-      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, wings folded, long feelers, heavy spikes, full body, centred, dark starfield background, rich colour, trading card art, digital painting, no text, no signature"
+      "prompt": "A large alien beetle, iridescent segmented shell, jointed legs, mandibles, compound eyes, ice blue shell, wings folded, long feelers, heavy spikes, full body, centred, dark starfield background, rich colour, clean silhouette, creature concept art, digital painting"
     }
   ]
 }
