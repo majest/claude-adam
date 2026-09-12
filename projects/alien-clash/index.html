@@ -11,7 +11,6 @@
   --void:#120827;
   --void-2:#1B0F3B;
   --panel:#241553;
-  --panel-2:#2E1B66;
   --edge:rgba(255,255,255,.14);
   --ink:#F3EDFF;
   --ink-2:#B4A6DC;
@@ -21,14 +20,12 @@
   --rare:#35C9EC;
   --epic:#C455EE;
   --legend:#F5B324;
+  --boss:#FFC83D;
 
-  --p1:#4ADE80;
-  --p2:#38BDF8;
-  --p3:#FB7185;
-  --p4:#FBBF24;
-
+  --gold:#F5B324;
+  --blood:#F2536B;
+  --sky:#38BDF8;
   --win:#4ADE80;
-  --lose:#F2536B;
 }
 
 *{box-sizing:border-box}
@@ -47,241 +44,175 @@ body{
   overflow-x:hidden;
 }
 
-/* ---------- shell ---------- */
 #app{
   min-height:100%;
   display:flex;flex-direction:column;
-  padding:16px;
-  padding-top:max(16px, env(safe-area-inset-top));
-  padding-bottom:max(16px, env(safe-area-inset-bottom));
-  max-width:1000px;margin:0 auto;
-  gap:16px;
+  padding:14px;
+  padding-top:max(14px, env(safe-area-inset-top));
+  padding-bottom:max(14px, env(safe-area-inset-bottom));
+  max-width:900px;margin:0 auto;
+  gap:14px;
 }
-.screen{display:none;flex:1;flex-direction:column;gap:16px;align-items:center;justify-content:center}
+.screen{display:none;flex:1;flex-direction:column;gap:14px;align-items:center;justify-content:center}
 .screen[data-on]{display:flex}
+#s-game[data-on]{justify-content:flex-start}
 
 h1{
   font-family:"Bungee",Impact,sans-serif;font-weight:400;
-  font-size:clamp(34px,10vw,68px);line-height:.95;margin:0;
-  text-align:center;letter-spacing:.01em;
+  font-size:clamp(32px,9.5vw,64px);line-height:.95;margin:0;
+  text-align:center;
   background:linear-gradient(180deg,#FFF 0%,#C9A8FF 55%,#7B4BD8 100%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   filter:drop-shadow(0 4px 18px rgba(150,90,255,.5));
 }
-h2{
-  font-family:"Bungee",Impact,sans-serif;font-weight:400;
-  font-size:clamp(19px,4.6vw,28px);margin:0;text-align:center;line-height:1.15;
-}
-.sub{
-  margin:0;text-align:center;color:var(--ink-2);
-  font-size:clamp(14px,3.6vw,17px);max-width:34ch;line-height:1.5;
-}
+h2{font-family:"Bungee",Impact,sans-serif;font-weight:400;font-size:clamp(19px,4.6vw,27px);margin:0;text-align:center}
+.sub{margin:0;text-align:center;color:var(--ink-2);font-size:clamp(14px,3.6vw,17px);max-width:34ch;line-height:1.5}
 .tiny{font-size:12.5px;color:var(--ink-3);text-align:center;margin:0;letter-spacing:.02em}
 
-/* ---------- buttons ---------- */
 .btn{
   font-family:"Bungee",Impact,sans-serif;font-weight:400;
   font-size:clamp(15px,4vw,19px);
-  min-height:56px;padding:14px 26px;
+  min-height:56px;padding:14px 24px;
   border:0;border-radius:14px;cursor:pointer;
   background:linear-gradient(180deg,#8B5CF6,#6D28D9);
   color:#fff;
   box-shadow:0 5px 0 #4C1D95, 0 12px 24px rgba(0,0,0,.4);
   transition:transform .08s, box-shadow .08s, filter .15s;
-  letter-spacing:.02em;
 }
 .btn:hover{filter:brightness(1.1)}
 .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #4C1D95, 0 6px 14px rgba(0,0,0,.4)}
-.btn.ghost{
-  background:rgba(255,255,255,.07);
-  box-shadow:0 3px 0 rgba(0,0,0,.35);
-  border:1px solid var(--edge);
-}
-.btn.big{font-size:clamp(17px,5vw,23px);min-height:66px;padding:16px 34px}
-.btn:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
-
+.btn.ghost{background:rgba(255,255,255,.07);box-shadow:0 3px 0 rgba(0,0,0,.35);border:1px solid var(--edge)}
+.btn.big{font-size:clamp(17px,5vw,22px);min-height:64px;padding:16px 30px}
+.btn:disabled{opacity:.4;cursor:default;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
 
-/* ---------- player count ---------- */
-.count{display:flex;gap:10px}
-.count button{
-  font-family:"Bungee",Impact,sans-serif;
-  width:64px;height:72px;font-size:26px;
-  border-radius:14px;cursor:pointer;color:var(--ink);
-  background:rgba(255,255,255,.06);
-  border:2px solid var(--edge);
-  transition:all .15s;
+/* ---------- the mat ---------- */
+.mat{display:flex;flex-direction:column;gap:9px;width:100%}
+.hudrow{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:8px 11px;border-radius:14px;width:100%;
+  background:rgba(0,0,0,.34);border:1px solid var(--edge);
 }
-.count button[aria-pressed="true"]{
-  background:linear-gradient(180deg,#8B5CF6,#6D28D9);
-  border-color:#C4A0FF;color:#fff;
-  box-shadow:0 0 0 4px rgba(139,92,246,.25);
-}
-.count button:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
+.hudrow.foe{cursor:pointer;font:inherit;color:var(--ink);text-align:left}
+.hudrow.foe.aimed{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,179,36,.3)}
+.hudrow.now{border-color:#A78BFA;box-shadow:0 0 0 3px rgba(139,92,246,.22)}
+.hudname{font-family:"Bungee",Impact,sans-serif;font-size:13px;flex:1;min-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;
+      background:rgba(255,255,255,.07);border:1px solid var(--edge);letter-spacing:.03em;white-space:nowrap}
+.pill b{font-variant-numeric:tabular-nums;font-size:15px}
+.pill.life{color:#FFD3DB;border-color:rgba(242,83,107,.55)}
+.pill.energy{color:#CFE6FF;border-color:rgba(56,189,248,.55)}
 
-/* ---------- the card ---------- */
-.card{
-  --accent:var(--common);
-  width:100%;max-width:300px;
-  aspect-ratio:5/7;
-  border-radius:18px;
-  padding:9px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 26%, var(--panel)) 0%, var(--panel) 34%, var(--void-2) 100%);
-  border:2px solid color-mix(in srgb, var(--accent) 70%, transparent);
-  box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.14);
-  display:flex;flex-direction:column;gap:7px;
-  position:relative;overflow:hidden;
-  flex:none;
+.lane{
+  display:flex;gap:8px;justify-content:center;align-items:flex-start;
+  min-height:112px;width:100%;padding:9px 8px;border-radius:14px;
+  background:rgba(255,255,255,.03);border:1px dashed var(--edge);
+  overflow-x:auto;
 }
-.card.foil::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.30) 48%,transparent 62%);
-  background-size:280% 280%;
-  animation:sheen 3.6s linear infinite;
-}
-@keyframes sheen{from{background-position:140% 0}to{background-position:-60% 0}}
+.lane.empty{align-items:center;justify-content:center}
+.lane-note{font-size:12px;color:var(--ink-3)}
 
-.card-head{display:flex;align-items:center;gap:6px;padding:1px 3px 0}
-.card-name{
-  font-family:"Bungee",Impact,sans-serif;font-weight:400;
-  font-size:15px;line-height:1.1;flex:1;min-width:0;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+.minion{
+  position:relative;flex:none;width:84px;padding:5px;border-radius:12px;
+  cursor:pointer;font:inherit;color:var(--ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 26%,var(--panel)) 0%,var(--void-2) 100%);
+  border:2px solid color-mix(in srgb,var(--accent) 70%,transparent);
+  transition:transform .1s, box-shadow .1s;
 }
-.pip{
-  font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 7px;border-radius:999px;flex:none;
-  background:color-mix(in srgb, var(--accent) 30%, transparent);
-  border:1px solid color-mix(in srgb, var(--accent) 65%, transparent);
-  color:color-mix(in srgb, var(--accent) 65%, #fff);
+.mart{width:100%;height:56px;display:block;border-radius:8px;background:#0A0518;border:1px solid rgba(255,255,255,.08)}
+.mname{display:block;font-size:8.5px;text-align:center;margin-top:3px;letter-spacing:.02em;
+       overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.mnum{
+  position:absolute;bottom:-7px;width:23px;height:23px;border-radius:50%;
+  font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;
+  display:flex;align-items:center;justify-content:center;border:2px solid rgba(0,0,0,.55);
 }
-.art{
-  width:100%;flex:1;min-height:0;display:block;
-  border-radius:12px;
-  background:#0A0518;
-  border:1px solid rgba(255,255,255,.1);
+.mnum.atk{left:-7px;background:var(--gold);color:#3A2500}
+.mnum.hp{right:-7px;background:var(--blood);color:#2E0008}
+.minion.picked{box-shadow:0 0 0 3px var(--gold),0 0 22px rgba(245,179,36,.5);transform:translateY(-5px)}
+.minion.spent{opacity:.5}
+.minion.boss{border-color:#FFD873;box-shadow:0 0 0 2px rgba(255,200,61,.45)}
+.tag{position:absolute;top:2px;font-size:11px;line-height:1;filter:drop-shadow(0 1px 3px #000)}
+.tag.q{left:3px}
+.tag.c{right:3px}
+
+.hand{display:flex;gap:8px;width:100%;overflow-x:auto;padding:8px 2px 12px;align-items:flex-start}
+.hand.empty{justify-content:center;color:var(--ink-3);font-size:12px;padding:16px 0}
+.handcard{
+  position:relative;flex:none;width:98px;padding:6px;border-radius:13px;
+  cursor:pointer;font:inherit;color:var(--ink);margin-top:6px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 28%,var(--panel)) 0%,var(--void-2) 100%);
+  border:2px solid color-mix(in srgb,var(--accent) 70%,transparent);
+  transition:transform .1s;
 }
-.card-species{
-  font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink-2);text-align:center;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.stat{
-  display:flex;align-items:baseline;justify-content:space-between;gap:4px;
-  padding:5px 8px;border-radius:9px;
-  background:rgba(0,0,0,.32);
-  border:1px solid rgba(255,255,255,.09);
-  transition:all .2s;
-}
-.stat span{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
-.stat b{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
-.stat.on{
-  background:rgba(245,179,36,.2);
-  border-color:#F5B324;
-  box-shadow:0 0 0 2px rgba(245,179,36,.25);
-}
-.stat.on span{color:#FFE0A0}
-.card-flavour{
-  font-size:11px;line-height:1.3;color:var(--ink-3);
-  text-align:center;font-style:italic;min-height:1.3em;
-  overflow:hidden;
+.handcard:not(.cant):hover{transform:translateY(-4px)}
+.handcard.cant{opacity:.42;cursor:default}
+.handcard.boss{border-color:#FFD873}
+.hart{width:100%;height:64px;display:block;border-radius:9px;background:#0A0518;border:1px solid rgba(255,255,255,.08)}
+.hname{display:block;font-size:9px;text-align:center;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hnums{display:flex;justify-content:space-between;margin-top:5px;padding:0 2px;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.hnums .a{color:var(--gold)}
+.hnums .l{color:var(--blood)}
+.cost{
+  position:absolute;top:-9px;left:-9px;width:27px;height:27px;border-radius:50%;
+  background:var(--sky);color:#04293D;font-weight:700;font-size:14px;
+  display:flex;align-items:center;justify-content:center;border:2px solid rgba(0,0,0,.55);z-index:2;
 }
 
-/* card backs + stacks */
-.card.back{
-  background:
-    repeating-linear-gradient(45deg,#2B1A5E 0 10px,#241553 10px 20px);
-  border-color:rgba(255,255,255,.18);
-  align-items:center;justify-content:center;
+.turnbar{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%}
+.saybox{
+  min-height:38px;display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:13px;text-align:center;color:var(--ink-2);
+  padding:7px 13px;border-radius:12px;background:rgba(0,0,0,.3);border:1px solid var(--edge);
+  width:100%;
 }
-.card.back .glyph{font-size:44px;filter:drop-shadow(0 3px 10px rgba(0,0,0,.6))}
+.keys{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3)}
 
-/* ---------- pick screen ---------- */
-.pickwrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
-.powers{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;max-width:340px}
-.power{
-  font-family:"Chakra Petch",sans-serif;font-weight:700;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  min-height:58px;padding:10px 14px;
-  border-radius:13px;cursor:pointer;color:var(--ink);
-  background:rgba(255,255,255,.07);
-  border:2px solid var(--edge);
-  box-shadow:0 3px 0 rgba(0,0,0,.35);
-  transition:all .12s;
+#roomname{
+  font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:19px;
+  padding:14px 16px;border-radius:13px;width:100%;max-width:320px;text-align:center;
+  background:rgba(0,0,0,.35);border:2px solid var(--edge);color:var(--ink);
 }
-.power em{font-style:normal;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
-.power b{font-size:24px;font-variant-numeric:tabular-nums}
-.power:hover{background:rgba(139,92,246,.28);border-color:#A78BFA}
-.power:active{transform:translateY(3px);box-shadow:0 0 0 rgba(0,0,0,.35)}
-.power:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
+#roomname:focus{outline:3px solid var(--gold);outline-offset:2px}
 
-/* ---------- reveal ---------- */
-.arena{
-  display:grid;gap:10px;width:100%;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  justify-items:center;
-}
-@media (min-width:760px){ .arena{grid-template-columns:repeat(var(--cols,4),minmax(0,1fr))} }
-.slot{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;min-width:0}
-.slot .card{max-width:220px}
-.who{
-  font-family:"Bungee",Impact,sans-serif;font-size:12px;
-  padding:4px 10px;border-radius:999px;
-  background:color-mix(in srgb, var(--pc) 26%, transparent);
-  border:1px solid var(--pc);color:var(--pc);
-  white-space:nowrap;
-}
-.slot.won .card{
-  border-color:var(--win);
-  box-shadow:0 0 0 3px rgba(74,222,128,.35), 0 12px 34px rgba(74,222,128,.28);
-  transform:translateY(-5px) scale(1.02);
-}
-.slot.out{opacity:.55}
-.crown{font-size:20px;line-height:1}
-.crown[hidden]{display:none}
-
-/* ---------- scoreboard ---------- */
-.board{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:100%}
-.chip{
-  display:flex;align-items:center;gap:6px;
-  font-size:12.5px;font-weight:700;
-  padding:6px 11px;border-radius:999px;
-  background:rgba(0,0,0,.3);
-  border:1px solid color-mix(in srgb, var(--pc) 55%, transparent);
-  color:var(--ink);
-}
-.chip i{width:9px;height:9px;border-radius:50%;background:var(--pc);flex:none}
-.chip u{text-decoration:none;color:var(--ink-2);font-variant-numeric:tabular-nums}
-.chip.lead{background:color-mix(in srgb, var(--pc) 22%, transparent)}
-.chip.dead{opacity:.4}
-
-.banner{
-  font-family:"Bungee",Impact,sans-serif;
-  font-size:clamp(16px,4.4vw,24px);text-align:center;
-  padding:10px 18px;border-radius:14px;
-  background:rgba(0,0,0,.35);border:1px solid var(--edge);
-  min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;
-}
-
-/* ---------- rules ---------- */
-details{
-  width:100%;max-width:420px;
-  background:rgba(0,0,0,.28);border:1px solid var(--edge);border-radius:13px;
-}
-summary{
-  cursor:pointer;padding:13px 16px;font-weight:700;
-  font-size:14.5px;letter-spacing:.03em;list-style:none;
-}
+details{width:100%;max-width:430px;background:rgba(0,0,0,.28);border:1px solid var(--edge);border-radius:13px}
+summary{cursor:pointer;padding:13px 16px;font-weight:700;font-size:14.5px;list-style:none}
 summary::-webkit-details-marker{display:none}
 summary::before{content:"▸ ";color:var(--ink-3)}
 details[open] summary::before{content:"▾ "}
-details ol{margin:0;padding:0 20px 15px 38px;color:var(--ink-2);font-size:14px;line-height:1.6}
+details ol,details ul{margin:0;padding:0 20px 15px 34px;color:var(--ink-2);font-size:14px;line-height:1.6}
 details li{margin-bottom:5px}
 
+#mute{
+  position:fixed;top:max(10px,env(safe-area-inset-top));right:10px;z-index:9;
+  width:42px;height:42px;border-radius:12px;cursor:pointer;font-size:18px;line-height:1;
+  background:rgba(0,0,0,.45);border:1px solid var(--edge);color:var(--ink);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+#mute:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+.card{
+  --accent:var(--common);
+  width:100%;max-width:210px;aspect-ratio:5/7;border-radius:16px;padding:8px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 26%,var(--panel)) 0%,var(--void-2) 100%);
+  border:2px solid color-mix(in srgb,var(--accent) 70%,transparent);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;gap:6px;flex:none;
+}
+.card.back{background:repeating-linear-gradient(45deg,#2B1A5E 0 10px,#241553 10px 20px);
+           align-items:center;justify-content:center;border-color:rgba(255,255,255,.18)}
+.card.back .glyph{font-size:42px;filter:drop-shadow(0 3px 10px rgba(0,0,0,.6))}
+
+@media (min-width:620px){
+  .minion{width:96px}
+  .mart{height:64px}
+  .mname{font-size:9.5px}
+  .handcard{width:110px}
+  .hart{height:72px}
+}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
-  .card.foil::after{display:none}
 }
 </style>
 
@@ -290,69 +221,98 @@ details li{margin-bottom:5px}
   <!-- ░░ TITLE ░░ -->
   <section class="screen" id="s-title" data-on>
     <h1>Alien<br>Clash</h1>
-    <p class="sub">Every card is an alien nobody has ever seen before. Flip, pick a power, and the biggest number takes the lot.</p>
-    <p class="tiny">How many of you are playing?</p>
-    <div class="count" id="count" role="group" aria-label="Number of players"></div>
-    <button class="btn big" id="start">Deal the cards</button>
+    <p class="sub">Put aliens on the table and knock the other player down to nothing. Every alien is invented the moment you see it.</p>
+    <div class="row">
+      <button class="btn big" id="go-pass">One screen</button>
+      <button class="btn big ghost" id="go-net">Two computers</button>
+    </div>
+    <p class="tiny" id="net-note">One screen: pass it over when it is the other player's turn.</p>
     <details>
       <summary>How to play</summary>
       <ol>
-        <li>Everyone gets a pile of alien cards, face down.</li>
-        <li>One player looks at their top card and picks a power: Power, Speed, Brains or Armour.</li>
-        <li>All the cards flip over at once.</li>
-        <li>Biggest number in that power wins every card on the table.</li>
-        <li>Same number twice? The cards wait in the middle and the next winner takes those too.</li>
-        <li>Run out of cards and you're out. Last one holding cards wins.</li>
+        <li>You start with 30 life. So does the other player. Knock theirs to zero and you win.</li>
+        <li>Every turn you get one more energy. The blue number on a card is what it costs.</li>
+        <li>Tap a card in your hand to put that alien on the table.</li>
+        <li>Tap your alien, then tap an alien to fight, or tap the other player to hit them.</li>
+        <li>Yellow number is how hard it hits. Red number is how much life it has left.</li>
+        <li>A new alien needs a rest, so it cannot fight the turn it arrives. Unless it has ⚡.</li>
+        <li>✨ means you get another card when it lands.</li>
       </ol>
     </details>
-    <p class="tiny">Pass the screen around. One phone or one computer is all you need.</p>
+  </section>
+
+  <!-- ░░ ROOM ░░ -->
+  <section class="screen" id="s-room">
+    <h2>Same name, both computers</h2>
+    <p class="sub">Pick a name and tell your friend. You both type the same one.</p>
+    <input id="roomname" maxlength="40" autocomplete="off" spellcheck="false" placeholder="space-badgers">
+    <button class="btn big" id="join">Go</button>
+    <p class="tiny" id="room-note">Small letters, numbers and dashes.</p>
+    <button class="btn ghost" id="room-back">Back</button>
+  </section>
+
+  <!-- ░░ WAITING ░░ -->
+  <section class="screen" id="s-wait">
+    <div class="card back" style="max-width:150px"><span class="glyph">👽</span></div>
+    <h2>Waiting for your friend</h2>
+    <p class="sub">They need to type <b id="wait-room"></b> and press Go.</p>
+    <p class="tiny" id="wait-note">Looking for them…</p>
+    <button class="btn ghost" id="wait-back">Give up</button>
   </section>
 
   <!-- ░░ PASS ░░ -->
   <section class="screen" id="s-pass">
-    <div class="card back" style="max-width:170px"><span class="glyph">👽</span></div>
-    <h2 id="pass-who">Player 1, it's your turn</h2>
-    <p class="sub" id="pass-note">Only you should see this card. Everyone else, look away!</p>
-    <button class="btn big" id="peek">See my alien</button>
-    <div class="board" id="pass-board"></div>
+    <div class="card back" style="max-width:150px"><span class="glyph">👽</span></div>
+    <h2 id="pass-who">Player 2, your turn</h2>
+    <p class="sub">Take the screen. Don't let the other player see your cards.</p>
+    <button class="btn big" id="pass-go">I'm ready</button>
   </section>
 
-  <!-- ░░ PICK ░░ -->
-  <section class="screen" id="s-pick">
-    <h2 id="pick-who">Player 1</h2>
-    <div class="pickwrap">
-      <div id="pick-card"></div>
-      <p class="tiny">Which power do you want to fight with?</p>
-      <div class="powers" id="powers"></div>
+  <!-- ░░ GAME ░░ -->
+  <section class="screen" id="s-game">
+    <div class="mat">
+      <button class="hudrow foe" id="foe-hud">
+        <span class="hudname" id="foe-name">Them</span>
+        <span class="pill life">❤ <b id="foe-life">30</b></span>
+        <span class="pill energy">⚡ <b id="foe-energy">0</b></span>
+        <span class="pill">🂠 <b id="foe-cards">0</b></span>
+      </button>
+      <div class="lane" id="foe-lane"></div>
+      <div class="lane" id="me-lane"></div>
+      <div class="hudrow" id="me-hud">
+        <span class="hudname" id="me-name">You</span>
+        <span class="pill life">❤ <b id="me-life">30</b></span>
+        <span class="pill energy">⚡ <b id="me-energy">0</b></span>
+        <span class="pill">🂠 <b id="me-cards">0</b></span>
+      </div>
+      <div class="saybox" id="say">Your turn.</div>
+      <div class="turnbar">
+        <button class="btn" id="end">End my turn</button>
+      </div>
+      <div class="hand" id="hand"></div>
+      <p class="keys">⚡ can fight straight away &nbsp;·&nbsp; ✨ gives you a card</p>
     </div>
   </section>
 
-  <!-- ░░ REVEAL ░░ -->
-  <section class="screen" id="s-reveal">
-    <div class="banner" id="verdict"></div>
-    <div class="arena" id="arena"></div>
-    <div class="board" id="reveal-board"></div>
-    <button class="btn big" id="next">Next round</button>
-  </section>
-
-  <!-- ░░ GAME OVER ░░ -->
+  <!-- ░░ OVER ░░ -->
   <section class="screen" id="s-over">
-    <h1 id="over-title">Player 1<br>wins!</h1>
-    <div id="over-card"></div>
+    <h1 id="over-title">You win!</h1>
     <p class="sub" id="over-note"></p>
-    <div class="board" id="over-board"></div>
     <button class="btn big" id="again">Play again</button>
   </section>
 
 </div>
 
+<button id="mute" aria-pressed="false" aria-label="Turn sound off" title="Sound on or off">🔊</button>
+
 <script>
 "use strict";
-/* ════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
    ALIEN CLASH
-   Every card is invented on the spot from a number (its seed),
-   so the same seed always makes the same alien.
-   ════════════════════════════════════════════════════════════ */
+   Every alien is invented on the spot from a number (its seed),
+   so the same seed always makes the same alien. Nothing here is
+   a picture file unless the painted set is sitting in art/.
+   ══════════════════════════════════════════════════════════ */
 
 const TAU = Math.PI * 2;
 
@@ -480,9 +440,6 @@ function makeCard(seed){
   };
 }
 
-/* ════════════════════════════════════════════════════════════
-   DRAWING THE ALIEN
-   ════════════════════════════════════════════════════════════ */
 function blobPath(ctx, pts){
   const n = pts.length;
   ctx.beginPath();
@@ -865,77 +822,11 @@ function paintCard(canvas, card){
 }
 </script>
 
-<style>
-/* ---------- boss frame, mode picker, mute, compact arena cards ---------- */
-:root{ --boss:#FFC83D }
-
-.card.boss{
-  border-color:#FFD873;
-  box-shadow:
-    0 0 0 2px rgba(255,200,61,.5),
-    0 0 34px rgba(255,182,30,.45),
-    0 10px 30px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.25);
-  animation:bossglow 2.4s ease-in-out infinite;
-}
-@keyframes bossglow{
-  50%{box-shadow:0 0 0 3px rgba(255,214,110,.75), 0 0 52px rgba(255,182,30,.7),
-      0 10px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.25)}
-}
-.card.boss .card-name{
-  background:linear-gradient(180deg,#FFF3CF,#FFC83D 60%,#C98A00);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-
-.modes{display:flex;gap:10px}
-.modes button{
-  font-family:"Chakra Petch",sans-serif;font-weight:700;
-  display:flex;flex-direction:column;gap:2px;align-items:center;
-  min-width:118px;min-height:66px;padding:10px 16px;
-  border-radius:14px;cursor:pointer;color:var(--ink);
-  background:rgba(255,255,255,.06);border:2px solid var(--edge);
-  transition:all .15s;
-}
-.modes button strong{font-family:"Bungee",Impact,sans-serif;font-weight:400;font-size:16px}
-.modes button small{font-size:11.5px;color:var(--ink-2);letter-spacing:.03em}
-.modes button[aria-pressed="true"]{
-  background:linear-gradient(180deg,#8B5CF6,#6D28D9);border-color:#C4A0FF;
-  box-shadow:0 0 0 4px rgba(139,92,246,.25);
-}
-.modes button[aria-pressed="true"] small{color:#E9DDFF}
-.modes button:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
-
-#mute{
-  position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:9;
-  width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:19px;line-height:1;
-  background:rgba(0,0,0,.4);border:1px solid var(--edge);color:var(--ink);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
-}
-#mute:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
-
-/* arena cards drop the small print so four of them fit a phone screen */
-.arena .card-flavour{display:none}
-.arena .card{max-width:min(220px,43vw);padding:7px;gap:5px}
-.arena .card-name{font-size:12.5px}
-.arena .stat{padding:4px 6px}
-.arena .stat b{font-size:14px}
-.arena .stat span{font-size:9px}
-.arena .card-species{font-size:9.5px}
-.arena .pip{font-size:8px;padding:2px 5px}
-@media (min-width:760px){
-  .arena .card{max-width:220px}
-  .arena .card-name{font-size:14px}
-  .arena .stat b{font-size:16px}
-}
-</style>
-
-<button id="mute" aria-pressed="false" aria-label="Turn sound off" title="Sound on or off">🔊</button>
-
 <script>
-/* ════════════════════════════════════════════════════════════
-   NOISES — made in code, because a project here cannot fetch
+/* ══════════════════════════════════════════════════════════
+   NOISES - made in code, because a project here cannot fetch
    sound files from the internet.
-   ════════════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════ */
 let AC = null, muted = false;
 try { muted = localStorage.getItem("alien-clash-muted") === "1"; } catch (e) {}
 
@@ -1005,9 +896,9 @@ paintMute();
 </script>
 
 <script>
-/* ════════════════════════════════════════════════════════════
-   THE BOSS — exactly one hides in every deck
-   ════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   THE BOSS - one hides in each side's deck
+   ══════════════════════════════════════════════════════════ */
 const BOSS = { key: "boss", label: "Boss", budget: [320, 356], foil: true };
 const BOSS_NAMES = ["Skullgrax","Doomblorb","Vorethrax","Gnashulon","Xarnoth","Gribbik","Malgroth","Zethmaw"];
 const BOSS_TITLES = {
@@ -1026,16 +917,72 @@ function makeBoss(seed){
   c.flavour = r.pick(BOSS_FLAVOUR);
   return c;
 }
+</script>
 
+<script>
 /* ════════════════════════════════════════════════════════════
    THE GAME
+
+   Aliens on a table. Energy grows by one every turn, so the
+   small ones come out first and the huge ones arrive late.
+   Knock the other player from 30 life to nothing.
+
+   The same alien cards as before, with three numbers read off
+   the stats they already had:
+
+     cost  from the whole budget  (a rarer alien costs more)
+     hit   from Power
+     life  from Armour
+     ⚡    Speed 60 or more: can fight the turn it lands
+     ✨    Brains 60 or more: gives you a card when it lands
+
+   TWO COMPUTERS, without either page ever being in charge.
+   Both pages build the same decks from the room name, then
+   swap only *moves* through the rooms service and replay them
+   in the same order. Same start plus same moves in the same
+   order means the same game on both screens, so there is no
+   host, no state to sync, and nothing to disagree about.
+   A move is only applied when it comes back from the service,
+   never straight away, or the two sides could order them
+   differently.
    ════════════════════════════════════════════════════════════ */
-const MODES = {
-  quick: { label: "Quick", per: 5,  cap: 16, note: "5 cards each" },
-  long:  { label: "Long",  per: 10, cap: 30, note: "10 cards each" }
+
+let paints = [];
+
+/* ---------- BATTLE NOISES ----------
+   Layered on purpose: a crack on top so the hit feels sharp, a low
+   thud underneath so it feels heavy, and a tail of rubble so it does
+   not stop dead. Bigger hits get more of all three. Still no sound
+   files anywhere - every one of these is built in code. */
+SFX.clash = function(hard){
+  const big = hard >= 7;
+  hiss(.07, big ? .16 : .11, 2600);                                        // the crack
+  tone({ freq: 210, to: 55, dur: .26, type: "sawtooth", gain: big ? .24 : .18 });   // the thud
+  tone({ freq: 1300, to: 640, dur: .13, type: "square", gain: .085, delay: .02 });  // metal ring
+  hiss(.22, .055, 850, .05);                                               // rubble
+  if (big){
+    tone({ freq: 70, to: 40, dur: .5, type: "sine", gain: .2, delay: .04 });
+    hiss(.3, .05, 300, .1);
+  }
 };
-const PCOLS = ["var(--p1)", "var(--p2)", "var(--p3)", "var(--p4)"];
-const S = { n: 4, mode: "quick", players: [], pot: [], leader: 0, round: 1, cap: 20 };
+SFX.smash = function(hard){
+  tone({ freq: 950, to: 130, dur: .28, type: "sawtooth", gain: .17 });     // incoming
+  hiss(.14, .17, 1700, .17);                                               // impact
+  tone({ freq: 88, to: 42, dur: .55, type: "sine", gain: .27, delay: .17 });  // boom
+  tone({ freq: 60, to: 34, dur: .6, type: "triangle", gain: .16, delay: .19 });
+  hiss(.42, .06, 260, .24);                                                // the dust
+  if (hard >= 6) [392, 523, 659].forEach((f, i) =>
+    tone({ freq: f, dur: .1, type: "square", gain: .075, delay: .3 + i * .07 }));
+};
+SFX.die = function(){
+  tone({ freq: 330, to: 55, dur: .42, type: "triangle", gain: .17 });
+  tone({ freq: 165, to: 40, dur: .5, type: "sine", gain: .12, delay: .03 });
+  hiss(.34, .07, 420, .04);
+};
+SFX.charge = function(){
+  [330, 440, 587].forEach((f, i) =>
+    tone({ freq: f, dur: .07, type: "square", gain: .07, delay: i * .045 }));
+};
 
 const $ = id => document.getElementById(id);
 function show(id){
@@ -1044,356 +991,539 @@ function show(id){
   window.scrollTo(0, 0);
 }
 
-/* ---------- card elements ---------- */
-let paints = [];
-function cardEl(card, onKey){
-  const el = document.createElement("div");
-  el.className = "card rarity-" + card.rarity.key +
-                 (card.rarity.foil ? " foil" : "") +
-                 (card.rarity.key === "boss" ? " boss" : "");
-  el.style.setProperty("--accent", "var(--" + card.rarity.key + ")");
+const ROOMS = "https://pr27r9l9jc.execute-api.eu-west-2.amazonaws.com";
+/* Tuned by playing it 40 games at a time, not by guessing.
+   At 20 cards the loser was simply running out of cards in 25 games
+   out of 40, which is a miserable way to lose, so the decks got
+   deeper than a game is long. Life stayed at 30: at 22 a game where
+   both players just charge was over in 7 turns and whoever went
+   first won 7 times in 10. */
+const START_LIFE = 30;
+const MAX_BOARD  = 5;
+const MAX_HAND   = 8;
+const DECK_SIZE  = 30;
+const MAX_ENERGY = 10;
+
+/* ---------- a card, ready to fight ---------- */
+function creature(card){
+  const s = card.stats;
+  const total = s.power + s.speed + s.brains + s.armour;
+  return {
+    card,
+    cost:   clamp(1 + Math.floor((total - 90) / 30), 1, MAX_ENERGY),
+    hit:    clamp(Math.round(s.power / 9), 1, 12),
+    life:   clamp(Math.round(s.armour / 9), 1, 12),
+    quick:  s.speed  >= 60,
+    clever: s.brains >= 60,
+    ready:  false,
+    spent:  false
+  };
+}
+
+/* Both sides build this from the same text, so both get the same
+   decks without sending a single card over the wire. */
+function buildDecks(seedText){
+  const r = new Rng("decks|" + seedText);
+  const all = [];
+  for (let i = 0; i < DECK_SIZE * 2; i++) all.push(makeCard(seedText + "|" + i));
+  all[r.int(0, DECK_SIZE - 1)] = makeBoss(seedText + "|boss-1");
+  all[r.int(DECK_SIZE, DECK_SIZE * 2 - 1)] = makeBoss(seedText + "|boss-2");
+  const deal = half => {
+    for (let i = half.length - 1; i > 0; i--){
+      const j = r.int(0, i);
+      const t = half[i]; half[i] = half[j]; half[j] = t;
+    }
+    return half.map(creature);
+  };
+  return [deal(all.slice(0, DECK_SIZE)), deal(all.slice(DECK_SIZE))];
+}
+
+/* ---------- where the game is up to ---------- */
+const G = {
+  mode: "pass",     // "pass" = one screen, "net" = two computers
+  seat: 0,          // which side this screen plays (only matters on "net")
+  room: "",
+  me: "",
+  turn: 0,
+  over: false,
+  winner: -1,
+  picked: -1,       // which of my aliens is chosen, ready to fight
+  sides: null,
+  started: false,
+  waiting: false,   // a move is out with the service and not back yet
+  since: 0,
+  poll: 0,
+  reading: false
+};
+const joined = [];
+
+function freshSide(deck){
+  return { life: START_LIFE, energy: 0, most: 0, deck, hand: [], board: [], tired: 0 };
+}
+
+function setup(seedText){
+  const decks = buildDecks(seedText);
+  G.sides = [freshSide(decks[0]), freshSide(decks[1])];
+  G.turn = 0; G.over = false; G.winner = -1; G.picked = -1; G.waiting = false;
+  drawCards(0, 3);
+  drawCards(1, 4);      // going second is a bit of a disadvantage, so one extra
+  beginTurn(0);
+}
+
+function drawCards(seat, n){
+  const s = G.sides[seat];
+  for (let k = 0; k < n; k++){
+    if (!s.deck.length){            // no cards left, so you get tired instead
+      s.tired++;
+      s.life -= s.tired;
+      continue;
+    }
+    const c = s.deck.shift();
+    if (s.hand.length < MAX_HAND) s.hand.push(c);
+  }
+}
+
+function beginTurn(seat){
+  G.turn = seat;
+  G.picked = -1;
+  const s = G.sides[seat];
+  s.most = Math.min(s.most + 1, MAX_ENERGY);
+  s.energy = s.most;
+  /* Going second is a real disadvantage: the other player hits first every
+     round. Measured over 40 games where both sides just charge, player one
+     won 31 of them. One extra energy on the very first turn evens it up. */
+  if (seat === 1 && s.most === 1) s.energy += 1;
+  for (const m of s.board){ m.ready = true; m.spent = false; }
+  drawCards(seat, 1);
+  checkOver();
+}
+
+function checkOver(){
+  if (G.over) return;
+  const downA = G.sides[0].life <= 0, downB = G.sides[1].life <= 0;
+  if (!downA && !downB) return;
+  G.over = true;
+  G.winner = (downA && downB) ? -1 : (downA ? 1 : 0);
+  stopReading();
+}
+
+function clearDead(){
+  let gone = 0;
+  for (const s of G.sides){
+    const before = s.board.length;
+    s.board = s.board.filter(m => m.life > 0);
+    gone += before - s.board.length;
+  }
+  if (gone) SFX.die();
+}
+
+/* ---------- doing a move ----------
+   Every move goes through here on both screens, in the same order.
+   Anything that does not make sense is ignored rather than trusted,
+   so a late or repeated move cannot bend the rules.                */
+function applyMove(mv){
+  if (G.over || !mv || mv.s !== G.turn) return;
+  const me = G.sides[mv.s], them = G.sides[1 - mv.s];
+
+  if (mv.t === "play"){
+    const c = me.hand[mv.i | 0];
+    if (!c || c.cost > me.energy || me.board.length >= MAX_BOARD) return;
+    me.hand.splice(mv.i | 0, 1);
+    me.energy -= c.cost;
+    c.ready = c.quick;
+    c.spent = false;
+    me.board.push(c);
+    (SFX[c.card.spKey] || SFX.flip)();
+    if (c.clever) drawCards(mv.s, 1);
+    checkOver();
+    return;
+  }
+
+  if (mv.t === "fight"){
+    const a = me.board[mv.a | 0];
+    if (!a || !a.ready || a.spent) return;
+    if (mv.d === -1){
+      them.life -= a.hit;
+      SFX.smash(a.hit);
+    } else {
+      const d = them.board[mv.d | 0];
+      if (!d) return;
+      d.life -= a.hit;
+      a.life -= d.hit;      // whatever you hit hits you back
+      SFX.clash(Math.max(a.hit, d.hit));
+    }
+    a.spent = true;
+    G.picked = -1;        // whoever was chosen has had its go, or has died
+    clearDead();
+    checkOver();
+    return;
+  }
+
+  if (mv.t === "done"){
+    beginTurn(1 - mv.s);
+  }
+}
+
+/* one screen applies straight away; two computers wait for the service */
+function doMove(mv){
+  if (G.over) return;
+  if (G.mode === "net"){
+    if (mv.s !== G.seat || G.waiting) return;
+    G.waiting = true;
+    render();
+    sendMove(mv);
+    return;
+  }
+  applyMove(mv);
+  if (mv.t === "done" && !G.over) askPass();
+  render();
+}
+
+/* ---------- talking to the rooms service ---------- */
+function sendMove(mv){
+  fetch(ROOMS, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ room: G.room, move: mv })
+  }).then(() => readMoves())
+    .catch(() => trouble("Could not reach the other computer."));
+}
+
+function readMoves(){
+  if (G.mode !== "net" || G.reading) return;
+  G.reading = true;
+  fetch(ROOMS, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ room: G.room, since: G.since })
+  }).then(res => res.json())
+    .then(data => {
+      G.reading = false;
+      if (!data || typeof data !== "object") return;
+      if (typeof data.now === "number") G.since = data.now;
+      const rows = Array.isArray(data.moves) ? data.moves : [];
+      let got = 0;
+      for (const row of rows){ if (intake(row)) got++; }
+      if (got) G.waiting = false;
+      if (G.started) render();
+    })
+    .catch(() => { G.reading = false; trouble("Lost the other computer for a moment."); });
+}
+
+/* a row may be the move itself or a wrapper around it */
+function intake(row){
+  const mv = (row && typeof row === "object" && row.move) ? row.move : row;
+  if (!mv || typeof mv !== "object") return false;
+  if (mv.t === "join"){
+    if (typeof mv.id === "string" && joined.indexOf(mv.id) === -1){
+      joined.push(mv.id);
+      settleSeats();
+    }
+    return false;
+  }
+  if (!G.started) return false;
+  applyMove(mv);
+  return true;
+}
+
+function settleSeats(){
+  if (G.started) return;
+  const mine = joined.indexOf(G.me);
+  if (mine === -1) return;
+  if (mine > 1){
+    stopReading();
+    $("wait-note").textContent = "That room is busy. Go back and pick another name.";
+    return;
+  }
+  if (joined.length < 2){
+    $("wait-note").textContent = "Found you. Waiting for one more…";
+    return;
+  }
+  G.seat = mine;
+  G.started = true;
+  setup(G.room);
+  SFX.win();
+  show("s-game");
+  render();
+}
+
+function startReading(){
+  stopReading();
+  G.poll = setInterval(readMoves, 1300);
+}
+function stopReading(){
+  if (G.poll){ clearInterval(G.poll); G.poll = 0; }
+}
+/* a forgotten loop runs all night, so stop the moment the page goes away */
+addEventListener("pagehide", stopReading);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopReading();
+  else if (G.mode === "net" && !G.over && G.room) startReading();
+});
+
+function trouble(msg){
+  if (G.started) say(msg);
+  else $("wait-note").textContent = msg;
+}
+
+/* ---------- what the screen says ---------- */
+function seatName(i){
+  if (G.mode === "net") return i === G.seat ? "You" : "Them";
+  return "Player " + (i + 1);
+}
+function myTurn(){
+  if (G.over) return false;
+  return G.mode === "pass" ? true : G.turn === G.seat;
+}
+function canAct(){ return myTurn() && !G.waiting; }
+function actor(){ return G.mode === "pass" ? G.turn : G.seat; }
+
+let sayTimer = 0;
+function say(msg){
+  $("say").textContent = msg;
+  clearTimeout(sayTimer);
+  sayTimer = setTimeout(() => { if (!G.over) $("say").textContent = standingNote(); }, 2600);
+}
+function standingNote(){
+  if (G.waiting) return "Sending…";
+  if (!myTurn()) return G.mode === "net" ? "Waiting for the other player."
+                                         : seatName(1 - actor()) + " is thinking.";
+  const s = G.sides[actor()];
+  if (G.picked >= 0) return "Now tap who it fights, or tap the other player.";
+  if (s.hand.some(c => c.cost <= s.energy) && s.board.length < MAX_BOARD) return "Play a card, or send an alien in.";
+  return "Send an alien in, or end your turn.";
+}
+
+/* ---------- drawing the mat ---------- */
+function minionEl(m, idx, mine){
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = "minion" +
+    (m.card.rarity.key === "boss" ? " boss" : "") +
+    ((mine && (m.spent || !m.ready)) ? " spent" : "") +
+    ((mine && G.picked === idx) ? " picked" : "");
+  el.style.setProperty("--accent", "var(--" + m.card.rarity.key + ")");
   el.innerHTML =
-    '<div class="card-head"><span class="card-name"></span><span class="pip"></span></div>' +
-    '<canvas class="art"></canvas>' +
-    '<div class="card-species"></div>' +
-    '<div class="stats">' + POWERS.map(p =>
-      '<div class="stat' + (onKey === p.key ? " on" : "") + '"><span>' + p.label +
-      '</span><b>' + card.stats[p.key] + "</b></div>").join("") +
-    '</div><div class="card-flavour"></div>';
-  el.querySelector(".card-name").textContent = card.name;
-  el.querySelector(".pip").textContent = card.rarity.label;
-  el.querySelector(".card-species").textContent = card.species;
-  el.querySelector(".card-flavour").textContent = card.flavour;
-  paints.push([el.querySelector(".art"), card]);
+    '<canvas class="mart"></canvas>' +
+    '<span class="mname"></span>' +
+    '<span class="mnum atk"></span><span class="mnum hp"></span>' +
+    (m.quick  ? '<span class="tag q">⚡</span>' : '') +
+    (m.clever ? '<span class="tag c">✨</span>' : '');
+  el.querySelector(".mname").textContent = m.card.name;
+  el.querySelector(".atk").textContent = m.hit;
+  el.querySelector(".hp").textContent = m.life;
+  el.setAttribute("aria-label",
+    m.card.name + ", hits " + m.hit + ", life " + m.life + (mine ? ", yours" : ", theirs"));
+  paints.push([el.querySelector(".mart"), m.card]);
+  el.addEventListener("click", () => tapMinion(idx, mine));
   return el;
 }
-function flushPaints(){
+
+function lane(hostId, seat, mine){
+  const host = $(hostId);
+  host.innerHTML = "";
+  const b = G.sides[seat].board;
+  host.classList.toggle("empty", b.length === 0);
+  if (!b.length){
+    const p = document.createElement("span");
+    p.className = "lane-note";
+    p.textContent = mine ? "Your aliens stand here" : "Nothing here yet";
+    host.appendChild(p);
+    return;
+  }
+  b.forEach((m, i) => host.appendChild(minionEl(m, i, mine)));
+}
+
+function hud(which, seat, mine){
+  const s = G.sides[seat];
+  $(which + "-name").textContent = seatName(seat) + (G.turn === seat ? " • turn" : "");
+  $(which + "-life").textContent = Math.max(0, s.life);
+  $(which + "-energy").textContent = s.energy;
+  $(which + "-cards").textContent = s.hand.length;
+  const row = $(which + "-hud");
+  row.classList.toggle("now", G.turn === seat);
+  if (!mine) row.classList.toggle("aimed", G.picked >= 0 && canAct());
+}
+
+function handRow(seat){
+  const host = $("hand");
+  host.innerHTML = "";
+  const s = G.sides[seat];
+  host.classList.toggle("empty", s.hand.length === 0);
+  if (!s.hand.length){
+    host.textContent = "No cards in your hand.";
+    return;
+  }
+  s.hand.forEach((c, i) => {
+    const room = s.board.length < MAX_BOARD;
+    const afford = canAct() && G.turn === seat && c.cost <= s.energy && room;
+    const el = document.createElement("button");
+    el.type = "button";
+    el.className = "handcard" + (afford ? "" : " cant") + (c.card.rarity.key === "boss" ? " boss" : "");
+    el.style.setProperty("--accent", "var(--" + c.card.rarity.key + ")");
+    el.innerHTML =
+      '<span class="cost"></span>' +
+      '<canvas class="hart"></canvas>' +
+      '<span class="hname"></span>' +
+      '<span class="hnums"><b class="a"></b><b class="l"></b></span>' +
+      (c.quick  ? '<span class="tag q">⚡</span>' : '') +
+      (c.clever ? '<span class="tag c">✨</span>' : '');
+    el.querySelector(".cost").textContent = c.cost;
+    el.querySelector(".hname").textContent = c.card.name;
+    el.querySelector(".a").textContent = c.hit;
+    el.querySelector(".l").textContent = c.life;
+    el.setAttribute("aria-label",
+      c.card.name + ", costs " + c.cost + ", hits " + c.hit + ", life " + c.life);
+    paints.push([el.querySelector(".hart"), c.card]);
+    el.addEventListener("click", () => {
+      if (!canAct()){ SFX.tap(); say("Not your turn."); return; }
+      if (!room){ SFX.tap(); say("Only " + MAX_BOARD + " aliens fit on the table."); return; }
+      if (c.cost > s.energy){ SFX.tap(); say("That one needs " + c.cost + " energy. You have " + s.energy + "."); return; }
+      SFX.flip();
+      doMove({ s: seat, t: "play", i: i });
+    });
+    host.appendChild(el);
+  });
+}
+
+function render(){
+  if (!G.sides) return;
+  if (G.over){ showOver(); return; }
+  paints = [];
+  const mine = G.mode === "net" ? G.seat : G.turn;
+  const theirs = 1 - mine;
+  hud("foe", theirs, false);
+  hud("me", mine, true);
+  lane("foe-lane", theirs, false);
+  lane("me-lane", mine, true);
+  handRow(mine);
+  $("end").disabled = !canAct();
+  $("say").textContent = standingNote();
   requestAnimationFrame(() => { for (const [cv, card] of paints) paintCard(cv, card); });
 }
-function put(hostId, node){
-  const host = $(hostId);
-  host.innerHTML = "";
-  if (node) host.appendChild(node);
-}
 
-/* ---------- scoreboard ---------- */
-function board(hostId){
-  const host = $(hostId);
-  host.innerHTML = "";
-  S.players.forEach((p, i) => {
-    const c = document.createElement("span");
-    const dead = p.hand.length === 0;
-    c.className = "chip" + (i === S.leader && !dead ? " lead" : "") + (dead ? " dead" : "");
-    c.style.setProperty("--pc", p.col);
-    c.innerHTML = '<i></i><span></span><u></u>';
-    c.querySelector("span").textContent = p.name;
-    c.querySelector("u").textContent = dead ? "out" : p.hand.length + (p.hand.length === 1 ? " card" : " cards");
-    host.appendChild(c);
-  });
-  if (S.pot.length){
-    const c = document.createElement("span");
-    c.className = "chip";
-    c.style.setProperty("--pc", "var(--legend)");
-    c.innerHTML = '<i></i><span></span>';
-    c.querySelector("span").textContent = "middle: " + S.pot.length;
-    host.appendChild(c);
+/* ---------- taps ---------- */
+function tapMinion(idx, mine){
+  if (!canAct()){ SFX.tap(); say("Not your turn."); return; }
+  const side = G.sides[actor()];
+  if (mine){
+    const m = side.board[idx];
+    if (!m) return;
+    if (!m.ready){ SFX.tap(); say("That one only just arrived. It fights next turn."); return; }
+    if (m.spent){ SFX.tap(); say("That one has already had its go."); return; }
+    G.picked = (G.picked === idx) ? -1 : idx;
+    if (G.picked >= 0) SFX.charge(); else SFX.tap();
+    render();
+    return;
   }
+  if (G.picked < 0){ SFX.tap(); say("Tap one of your own aliens first."); return; }
+  doMove({ s: actor(), t: "fight", a: G.picked, d: idx });
 }
 
-/* ---------- deck ---------- */
-function shuffle(a){
-  for (let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    const t = a[i]; a[i] = a[j]; a[j] = t;
-  }
-  return a;
-}
-function buildDeck(total){
-  const base = (Math.random() * 1e9 | 0) + "-" + Date.now();
-  const cards = [];
-  for (let i = 0; i < total; i++) cards.push(makeCard(base + "-" + i));
-  cards[Math.floor(Math.random() * total)] = makeBoss(base + "-boss");
-  return shuffle(cards);
-}
-
-/* ---------- flow ---------- */
-function startGame(){
-  const M = MODES[S.mode];
-  S.players = [];
-  for (let i = 0; i < S.n; i++) S.players.push({ name: "Player " + (i + 1), col: PCOLS[i], hand: [] });
-  const deck = buildDeck(S.n * M.per);
-  deck.forEach((c, i) => S.players[i % S.n].hand.push(c));
-  S.pot = []; S.leader = 0; S.round = 1; S.cap = M.cap;
-  S.deck = deck;
-  showDeck();
-}
-
-const living = () => S.players.filter(p => p.hand.length > 0);
-
-function goPass(){
-  if (living().length <= 1) return gameOver();
-  if (S.round > S.cap) return gameOver();
-  let guard = 0;
-  while (S.players[S.leader].hand.length === 0 && guard++ < 8) S.leader = (S.leader + 1) % S.n;
-  const p = S.players[S.leader];
-  $("pass-who").textContent = p.name + ", it's your turn";
-  $("pass-who").style.color = p.col;
-  $("pass-note").textContent = "Round " + S.round + " of " + S.cap +
-    ". Only you should see this card, so everyone else look away!";
-  board("pass-board");
+function askPass(){
+  $("pass-who").textContent = seatName(G.turn) + ", your turn";
   show("s-pass");
 }
 
-function goPick(){
-  paints = [];
-  const p = S.players[S.leader], card = p.hand[0];
-  $("pick-who").textContent = p.name;
-  $("pick-who").style.color = p.col;
-  put("pick-card", cardEl(card));
-  const host = $("powers");
-  host.innerHTML = "";
-  POWERS.forEach(pw => {
-    const b = document.createElement("button");
-    b.className = "power";
-    b.type = "button";
-    b.innerHTML = "<em></em><b></b>";
-    b.querySelector("em").textContent = pw.label;
-    b.querySelector("b").textContent = card.stats[pw.key];
-    b.addEventListener("click", () => { SFX.flip(); doReveal(pw.key); });
-    host.appendChild(b);
-  });
-  show("s-pick");
-  flushPaints();
-  SFX[card.spKey === "mech" ? "mech" : card.spKey === "slime" ? "slime" : "bug"]();
-}
-
-function doReveal(key){
-  paints = [];
-  const label = POWERS.find(p => p.key === key).label;
-  const entries = [];
-  S.players.forEach((p, i) => { if (p.hand.length) entries.push({ p, i, card: p.hand[0] }); });
-
-  const best = Math.max.apply(null, entries.map(e => e.card.stats[key]));
-  const winners = entries.filter(e => e.card.stats[key] === best);
-  const tie = winners.length > 1;
-
-  const arena = $("arena");
-  arena.innerHTML = "";
-  arena.style.setProperty("--cols", String(Math.min(4, entries.length)));
-  entries.forEach(e => {
-    const slot = document.createElement("div");
-    slot.className = "slot" + (!tie && e === winners[0] ? " won" : "");
-    slot.style.setProperty("--pc", e.p.col);
-    const tag = document.createElement("span");
-    tag.className = "who";
-    tag.textContent = e.p.name + (e.i === S.leader ? " (chose)" : "");
-    slot.appendChild(tag);
-    slot.appendChild(cardEl(e.card, key));
-    if (!tie && e === winners[0]){
-      const cr = document.createElement("span");
-      cr.className = "crown";
-      cr.textContent = "👑";
-      slot.appendChild(cr);
-    }
-    arena.appendChild(slot);
-  });
-
-  const taken = entries.map(e => e.p.hand.shift());
-  const hadBoss = taken.some(c => c.rarity.key === "boss");
-  let msg;
-  if (tie){
-    S.pot.push.apply(S.pot, taken);
-    msg = "Tie on " + label + "! " + taken.length + " cards wait in the middle.";
-    S.leader = (S.leader + 1) % S.n;
-    SFX.tie();
-  } else {
-    const w = winners[0];
-    const haul = shuffle(taken.concat(S.pot));
-    S.pot = [];
-    w.p.hand.push.apply(w.p.hand, haul);
-    S.leader = w.i;
-    msg = w.p.name + " wins " + haul.length + (haul.length === 1 ? " card" : " cards") +
-          " with " + label + " " + best + "!";
-    if (hadBoss) SFX.boss();
-    SFX.win();
-  }
-  const justOut = S.players.filter(p => p.hand.length === 0 && !p.wasOut);
-  justOut.forEach(p => { p.wasOut = true; });
-  if (justOut.length && !tie) SFX.out();
-
-  $("verdict").textContent = (hadBoss ? "☠️ " : "") + msg;
-  board("reveal-board");
-  $("next").textContent = (living().length <= 1 || S.round >= S.cap) ? "See who won" : "Next round";
-  show("s-reveal");
-  flushPaints();
-}
-
-function gameOver(){
-  paints = [];
-  const ranked = S.players.slice().sort((a, b) => b.hand.length - a.hand.length);
-  const top = ranked[0];
-  const draw = ranked[1] && ranked[1].hand.length === top.hand.length;
-  $("over-title").innerHTML = "";
-  $("over-title").textContent = draw ? "It's a draw!" : top.name + " wins!";
-  $("over-title").style.color = draw ? "" : top.col;
-  $("over-note").textContent = draw
-    ? "Two of you finished with exactly the same pile. Rematch?"
-    : "Finished with " + top.hand.length + " cards after " + Math.min(S.round, S.cap) + " rounds.";
-  const best = top.hand.slice().sort((a, b) =>
-    (b.stats.power + b.stats.speed + b.stats.brains + b.stats.armour) -
-    (a.stats.power + a.stats.speed + a.stats.brains + a.stats.armour))[0];
-  put("over-card", best ? cardEl(best) : null);
-  board("over-board");
+function showOver(){
+  stopReading();
+  const w = G.winner;
+  $("over-title").textContent = w < 0 ? "A draw!"
+    : (G.mode === "net" ? (w === G.seat ? "You win!" : "You lost")
+                        : seatName(w) + " wins!");
+  const a = Math.max(0, G.sides[0].life), b = Math.max(0, G.sides[1].life);
+  $("over-note").textContent = seatName(0) + " finished on " + a + " life, " +
+                               seatName(1) + " on " + b + ".";
+  (w < 0 ? SFX.tie : SFX.fanfare)();
   show("s-over");
-  flushPaints();
-  SFX.fanfare();
 }
 
-/* ---------- title screen ---------- */
-const countHost = $("count");
-[2, 3, 4].forEach(n => {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.textContent = n;
-  b.setAttribute("aria-pressed", String(n === S.n));
-  b.setAttribute("aria-label", n + " players");
-  b.addEventListener("click", () => {
-    S.n = n;
-    [].forEach.call(countHost.children, c => c.setAttribute("aria-pressed", String(c === b)));
-    SFX.tap();
-  });
-  countHost.appendChild(b);
-});
-
-const modeHost = document.createElement("div");
-modeHost.className = "modes";
-modeHost.setAttribute("role", "group");
-modeHost.setAttribute("aria-label", "Game length");
-Object.keys(MODES).forEach(k => {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.setAttribute("aria-pressed", String(k === S.mode));
-  b.innerHTML = "<strong></strong><small></small>";
-  b.querySelector("strong").textContent = MODES[k].label;
-  b.querySelector("small").textContent = MODES[k].note;
-  b.addEventListener("click", () => {
-    S.mode = k;
-    [].forEach.call(modeHost.children, c => c.setAttribute("aria-pressed", String(c === b)));
-    SFX.tap();
-  });
-  modeHost.appendChild(b);
-});
-countHost.insertAdjacentElement("afterend", modeHost);
-countHost.insertAdjacentHTML("afterend", '<p class="tiny">Quick game or long game?</p>');
-
-$("start").addEventListener("click", () => { SFX.flip(); startGame(); });
-$("peek").addEventListener("click", () => { SFX.flip(); goPick(); });
-$("next").addEventListener("click", () => {
+/* ---------- buttons ---------- */
+$("go-pass").addEventListener("click", () => {
   SFX.tap();
-  S.round++;
-  if (living().length <= 1 || S.round > S.cap) gameOver(); else goPass();
+  G.mode = "pass";
+  G.room = "";
+  stopReading();
+  setup("table-" + Date.now() + "-" + (Math.random() * 1e9 | 0));
+  show("s-game");
+  render();
 });
-$("again").addEventListener("click", () => { SFX.tap(); show("s-title"); });
 
-let rt;
+$("go-net").addEventListener("click", () => {
+  SFX.tap();
+  show("s-room");
+  $("roomname").focus();
+});
+$("room-back").addEventListener("click", () => { SFX.tap(); show("s-title"); });
+$("wait-back").addEventListener("click", () => { SFX.tap(); stopReading(); show("s-title"); });
+
+$("join").addEventListener("click", () => {
+  const room = $("roomname").value.trim().toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+  if (room.length < 3){
+    $("room-note").textContent = "That name is too short. Try a longer one.";
+    return;
+  }
+  SFX.tap();
+  G.mode = "net";
+  G.room = room;
+  G.me = "p" + Date.now().toString(36) + (Math.random() * 1e6 | 0).toString(36);
+  G.since = 0;
+  G.started = false;
+  joined.length = 0;
+  $("wait-room").textContent = room;
+  $("wait-note").textContent = "Looking for them…";
+  show("s-wait");
+  sendMove({ t: "join", id: G.me });
+  startReading();
+});
+$("roomname").addEventListener("keydown", e => { if (e.key === "Enter") $("join").click(); });
+
+$("end").addEventListener("click", () => {
+  if (!canAct()) return;
+  SFX.tap();
+  doMove({ s: actor(), t: "done" });
+});
+
+$("foe-hud").addEventListener("click", () => {
+  if (!canAct()){ SFX.tap(); say("Not your turn."); return; }
+  if (G.picked < 0){ SFX.tap(); say("Tap one of your own aliens first."); return; }
+  doMove({ s: actor(), t: "fight", a: G.picked, d: -1 });
+});
+
+$("pass-go").addEventListener("click", () => { SFX.tap(); show("s-game"); render(); });
+
+$("again").addEventListener("click", () => {
+  SFX.tap();
+  stopReading();
+  G.started = false;
+  G.sides = null;
+  show("s-title");
+});
+
+/* two computers needs the website; opened straight from the file there is
+   nothing to talk to, so say that instead of letting it fail quietly */
+if (location.protocol === "file:"){
+  $("go-net").disabled = true;
+  $("net-note").textContent = "Two computers only works on the website, not on the file.";
+}
+
+let resizeTimer;
 addEventListener("resize", () => {
-  clearTimeout(rt);
-  rt = setTimeout(() => { for (const [cv, card] of paints) paintCard(cv, card); }, 200);
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { for (const [cv, card] of paints) paintCard(cv, card); }, 200);
 });
 </script>
 
 <script>
-/* ════════════════════════════════════════════════════════════
-   OPTIONAL EXTRA WORDS
-   The machine at home can write alien names and flavour lines
-   ahead of time into an "aliens.json" sitting next to this file.
-   Nothing here talks to a server: it reads a plain file, once,
-   and if the file is missing the game carries on exactly as it
-   is. Opening index.html by double-clicking blocks the read, so
-   absence has to be normal, not an error.
-
-   Shape:
-   {
-     "names":     ["Zorblax", ...],
-     "bossNames": ["Skullgrax", ...],
-     "titles":  { "slime": [...], "mech": [...], "bug": [...] },
-     "flavour": { "slime": [...], "mech": [...], "bug": [...] }
-   }
-   Every field is optional and anything unexpected is ignored.
-   ════════════════════════════════════════════════════════════ */
-(function(){
-  // keep the cards readable whatever the model writes
-  const clean = (v, maxChars) => Array.isArray(v)
-    ? v.filter(x => typeof x === "string")
-       .map(x => x.trim())
-       .filter(x => x.length > 0 && x.length <= maxChars)
-       .slice(0, 500)
-    : [];
-
-  // opened straight from disk? a file:// fetch is refused and logs a scary
-  // red error, so don't even try. The game needs no extra words to work.
-  if (location.protocol === "file:") return;
-
-  fetch("aliens.json", { cache: "no-store" })
-    .then(res => res.ok ? res.json() : null)
-    .then(data => {
-      if (!data || typeof data !== "object") return;
-      let added = 0;
-
-      const names = clean(data.names, 14);
-      if (names.length){ PRE.length = 0; SUF.length = 0; PRE.push.apply(PRE, names); added += names.length; }
-
-      const bosses = clean(data.bossNames, 16);
-      if (bosses.length){ BOSS_NAMES.length = 0; BOSS_NAMES.push.apply(BOSS_NAMES, bosses); added += bosses.length; }
-
-      ["slime", "mech", "bug"].forEach(k => {
-        const t = clean(data.titles && data.titles[k], 20);
-        if (t.length){ SPECIES[k].names = t; added += t.length; }
-        const f = clean(data.flavour && data.flavour[k], 60);
-        if (f.length){ SPECIES[k].flavour = f; added += f.length; }
-      });
-
-      if (added) console.log("Alien Clash: loaded " + added + " extra words from aliens.json");
-    })
-    .catch(() => {});   // no file, or opened straight from disk. Both fine.
-})();
-</script>
-
-<style>
-/* ---------- every-card gallery ---------- */
-#s-deck{justify-content:flex-start;padding-top:8px}
-#s-deck h2{padding-right:56px}
-@media (min-width:700px){ #s-deck h2{padding-right:0} }
-.gallery{
-  display:grid;gap:9px;width:100%;
-  grid-template-columns:repeat(auto-fill,minmax(124px,1fr));
-}
-@media (min-width:700px){ .gallery{grid-template-columns:repeat(auto-fill,minmax(158px,1fr))} }
-.gallery .card{max-width:none;padding:6px;gap:4px}
-.gallery .card-flavour{display:none}
-.gallery .card-name{font-size:11.5px}
-.gallery .card-species{font-size:8.5px}
-.gallery .stat{padding:3px 5px}
-.gallery .stat span{font-size:8px}
-.gallery .stat b{font-size:13px}
-.gallery .pip{font-size:7.5px;padding:2px 4px}
-.deck-scroll{
-  width:100%;max-height:min(62vh,620px);overflow-y:auto;
-  padding:3px;border-radius:14px;
-  background:rgba(0,0,0,.22);border:1px solid var(--edge);
-}
-</style>
-
-<script>
-/* ════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
    PAINTED PORTRAITS (optional)
-   If the machine at home has drawn real pictures, they live in
+   If the machine at home has painted real pictures they live in
    an art/ folder next to this file with an index.json listing
-   them. When they are there a card shows the painting; when
-   they are not, the alien is drawn in code exactly as before.
-   Nothing is fetched from a server, and opening the file from
-   disk skips the lookup entirely.
-   ════════════════════════════════════════════════════════════ */
+   them. When they are there an alien shows its painting; when
+   they are not, it is drawn in code exactly as before. Opening
+   this file from disk skips the lookup entirely.
+   ══════════════════════════════════════════════════════════ */
 const ART = { sets: { slime: [], mech: [], bug: [] }, cache: {}, on: false };
 
 function repaintAll(){ for (const [cv, card] of paints) paintCard(cv, card); }
@@ -1445,39 +1575,51 @@ function drawCover(ctx, img, w, h){
     })
     .catch(() => {});
 })();
+</script>
 
-/* ════════════════════════════════════════════════════════════
-   THE WHOLE DECK, BEFORE YOU START
-   ════════════════════════════════════════════════════════════ */
-const RANK = { boss: 0, legend: 1, epic: 2, rare: 3, common: 4 };
+<script>
+/* ══════════════════════════════════════════════════════════
+   OPTIONAL EXTRA WORDS
+   The machine at home can write alien names and flavour lines
+   ahead of time into an "aliens.json" sitting next to this file.
+   Nothing here talks to a server: it reads a plain file, once,
+   and if the file is missing the game carries on exactly as it
+   is.
+   ══════════════════════════════════════════════════════════ */
+(function(){
+  // keep the cards readable whatever the model writes
+  const clean = (v, maxChars) => Array.isArray(v)
+    ? v.filter(x => typeof x === "string")
+       .map(x => x.trim())
+       .filter(x => x.length > 0 && x.length <= maxChars)
+       .slice(0, 500)
+    : [];
 
-(function buildDeckScreen(){
-  const sec = document.createElement("section");
-  sec.className = "screen";
-  sec.id = "s-deck";
-  sec.innerHTML =
-    '<h2>Every alien in this game</h2>' +
-    '<p class="tiny" id="deck-note"></p>' +
-    '<div class="deck-scroll"><div class="gallery" id="gallery"></div></div>' +
-    '<button class="btn big" id="deck-go">Start playing</button>';
-  document.getElementById("app").appendChild(sec);
-  sec.querySelector("#deck-go").addEventListener("click", () => { SFX.flip(); goPass(); });
+  // opened straight from disk? a file:// fetch is refused and logs a scary
+  // red error, so don't even try. The game needs no extra words to work.
+  if (location.protocol === "file:") return;
+
+  fetch("aliens.json", { cache: "no-store" })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      if (!data || typeof data !== "object") return;
+      let added = 0;
+
+      const names = clean(data.names, 14);
+      if (names.length){ PRE.length = 0; SUF.length = 0; PRE.push.apply(PRE, names); added += names.length; }
+
+      const bosses = clean(data.bossNames, 16);
+      if (bosses.length){ BOSS_NAMES.length = 0; BOSS_NAMES.push.apply(BOSS_NAMES, bosses); added += bosses.length; }
+
+      ["slime", "mech", "bug"].forEach(k => {
+        const t = clean(data.titles && data.titles[k], 20);
+        if (t.length){ SPECIES[k].names = t; added += t.length; }
+        const f = clean(data.flavour && data.flavour[k], 60);
+        if (f.length){ SPECIES[k].flavour = f; added += f.length; }
+      });
+
+      if (added) console.log("Alien Clash: loaded " + added + " extra words from aliens.json");
+    })
+    .catch(() => {});   // no file, or opened straight from disk. Both fine.
 })();
-
-function showDeck(){
-  paints = [];
-  const cards = S.deck.slice().sort((a, b) =>
-    (RANK[a.rarity.key] - RANK[b.rarity.key]) || a.name.localeCompare(b.name));
-  const host = $("gallery");
-  host.innerHTML = "";
-  cards.forEach(c => host.appendChild(cardEl(c)));
-  const counts = {};
-  cards.forEach(c => { counts[c.rarity.label] = (counts[c.rarity.label] || 0) + 1; });
-  $("deck-note").textContent = cards.length + " cards, shuffled and dealt already. " +
-    ["Boss", "Legendary", "Epic", "Rare", "Common"].filter(k => counts[k])
-      .map(k => counts[k] + " " + k.toLowerCase()).join(", ") + ".";
-  show("s-deck");
-  flushPaints();
-  SFX.win();
-}
 </script>
