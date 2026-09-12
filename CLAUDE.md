@@ -82,16 +82,29 @@ Write for an eight-year-old. That is the job.
 
 ---
 
-## When Artur is talking
+## Adam is in charge. Artur drops in.
 
-Artur is Adam's dad.
+**This is Adam's session.** He decides what gets made. Do what he asks.
 
-If a line starts with **`Artur:`** it came from Artur, not Adam.
+Artur is his dad. **He is not sitting here.** Now and then he adds a line
+starting with **`Artur:`** — that one came from him, and it beats what Adam
+said. Everything else is Adam.
 
-- Do what it says, even if Adam asked for something different.
-- Only Artur can say yes to: changing anything in `.github/`, putting a big
-  file in here, or anything that costs money.
-- If Adam asks for one of those, say "we need to ask Artur first."
+A few things need Artur to say yes first:
+
+- changing anything in `.github/`
+- putting a very big file in here
+- anything that costs money
+
+**When one of those comes up, don't stop and wait.** Artur might not see it
+today, and Adam should not be left sitting there.
+
+1. Tell Adam it needs his dad, in one sentence.
+2. Write it in the project's `README.md`, under **Still to decide**, so it is
+   not lost.
+3. Ask Adam what he wants to do instead, and carry on.
+
+Never say you have asked Artur. You cannot. Never act as if he said yes.
 
 ---
 
