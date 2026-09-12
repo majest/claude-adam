@@ -6,7 +6,7 @@ second you flip it, so nobody has seen your cards before you do.
 ## How to play
 
 1. Choose how many of you are playing, and a **Quick** game (5 cards each) or a
-   **Long** one (10 cards each).
+   **Long** one (10 cards each). Every card in the deck is then shown to you.
 2. The screen says whose turn it is. That player looks at their top card and
    everyone else looks away.
 3. That player picks a power: **Power**, **Speed**, **Brains** or **Armour**.
@@ -42,6 +42,19 @@ internet. Every noise is built in code with the Web Audio API: slimes squelch
 (a sine wave falling from 430 Hz to 80 Hz with a burst of filtered noise), mechs
 beep two square notes, bugs chirp three rising ticks, and the boss growls a low
 sawtooth. Winning plays a little arpeggio.
+
+## Seeing every card
+
+After the cards are dealt the whole deck is laid out, boss first, so you can see
+what is in play before anyone takes a turn. Tap **Start playing** to begin.
+
+## Painted portraits from the AI machine
+
+Aliens are drawn in code, which is why they are cartoons rather than paintings.
+If the machine at home paints real portraits into `art/` with an `index.json`
+listing them, each card shows a painting instead and falls back to the drawn
+alien for any family that has none. The full spec and the prompts are in
+`art/PROMPTS.md`.
 
 ## Extra words from the AI machine
 
