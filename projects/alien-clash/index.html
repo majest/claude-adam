@@ -169,6 +169,14 @@ h2{font-family:"Bungee",Impact,sans-serif;font-weight:400;font-size:clamp(19px,4
 }
 .keys{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3)}
 
+.joinbox{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  padding:12px;border-radius:16px;background:rgba(255,255,255,.92);
+  border:1px solid var(--edge);
+}
+.joinbox .tiny{color:#4A3B70}
+#joincode{display:block;border-radius:6px;image-rendering:pixelated;max-width:100%;height:auto}
+
 #roomname{
   font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:19px;
   padding:14px 16px;border-radius:13px;width:100%;max-width:320px;text-align:center;
@@ -255,7 +263,11 @@ details li{margin-bottom:5px}
   <section class="screen" id="s-wait">
     <div class="card back" style="max-width:150px"><span class="glyph">👽</span></div>
     <h2>Waiting for your friend</h2>
-    <p class="sub">They need to type <b id="wait-room"></b> and press Go.</p>
+    <div class="joinbox" id="joinbox">
+      <canvas id="joincode" aria-label="Square code that opens this game"></canvas>
+      <p class="tiny">Point their phone camera at this</p>
+    </div>
+    <p class="sub">Or they type <b id="wait-room"></b> and press Go.</p>
     <p class="tiny" id="wait-note">Looking for them…</p>
     <button class="btn ghost" id="wait-back">Give up</button>
   </section>
@@ -921,6 +933,247 @@ function makeBoss(seed){
 
 <script>
 /* ════════════════════════════════════════════════════════════
+   A QR CODE, MADE IN CODE
+
+   Nothing in this repo may be fetched from the internet, so the
+   code that draws the square pattern is here rather than in a
+   library. It does byte mode at error-correction level L in
+   versions 1 to 5, which is a single block of data and so
+   avoids all the interleaving. Version 5 holds 106 characters,
+   and the link this needs to carry is about sixty.
+   ════════════════════════════════════════════════════════════ */
+const QR = (function(){
+  const DATA = [19, 34, 55, 80, 108];   // data codewords, level L, versions 1-5
+  const ECC  = [7, 10, 15, 20, 26];     // error-correction codewords for each
+
+  /* sums and products in the 256-value field the standard uses */
+  const exp = new Uint8Array(512), log = new Uint8Array(256);
+  (function(){
+    let x = 1;
+    for (let i = 0; i < 255; i++){
+      exp[i] = x; log[x] = i;
+      x <<= 1; if (x & 0x100) x ^= 0x11D;
+    }
+    for (let i = 255; i < 512; i++) exp[i] = exp[i - 255];
+  })();
+  const mul = (a, b) => (a && b) ? exp[log[a] + log[b]] : 0;
+
+  function polyMul(a, b){
+    const r = new Array(a.length + b.length - 1).fill(0);
+    for (let i = 0; i < a.length; i++)
+      for (let j = 0; j < b.length; j++)
+        r[i + j] ^= mul(a[i], b[j]);
+    return r;
+  }
+  function generator(n){
+    let g = [1];
+    for (let i = 0; i < n; i++) g = polyMul(g, [1, exp[i]]);
+    return g;
+  }
+  function remainder(data, n){
+    const g = generator(n);
+    const r = data.concat(new Array(n).fill(0));
+    for (let i = 0; i < data.length; i++){
+      const c = r[i];
+      if (!c) continue;
+      for (let j = 0; j < g.length; j++) r[i + j] ^= mul(g[j], c);
+    }
+    return r.slice(data.length);
+  }
+
+  const MASKS = [
+    (r, c) => (r + c) % 2 === 0,
+    (r, c) => r % 2 === 0,
+    (r, c) => c % 3 === 0,
+    (r, c) => (r + c) % 3 === 0,
+    (r, c) => (((r >> 1) + Math.floor(c / 3)) % 2) === 0,
+    (r, c) => ((r * c) % 2 + (r * c) % 3) === 0,
+    (r, c) => (((r * c) % 2 + (r * c) % 3) % 2) === 0,
+    (r, c) => (((r + c) % 2 + (r * c) % 3) % 2) === 0
+  ];
+
+  /* how bad a finished pattern is to scan, by the standard's four rules */
+  function penalty(m, size){
+    let p = 0;
+    const at = (r, c) => m[r * size + c];
+    // rule 1: runs of five or more the same, in rows and in columns
+    for (let pass = 0; pass < 2; pass++){
+      for (let a = 0; a < size; a++){
+        let run = 1, prev = -1;
+        for (let b = 0; b < size; b++){
+          const v = pass ? at(b, a) : at(a, b);
+          if (v === prev) run++;
+          else { if (run >= 5) p += run - 2; run = 1; prev = v; }
+        }
+        if (run >= 5) p += run - 2;
+      }
+    }
+    // rule 2: any 2x2 block all the same
+    for (let r = 0; r < size - 1; r++)
+      for (let c = 0; c < size - 1; c++){
+        const v = at(r, c);
+        if (v === at(r, c+1) && v === at(r+1, c) && v === at(r+1, c+1)) p += 3;
+      }
+    // rule 3: the 1:1:3:1:1 finder-lookalike, with four light either side
+    const look = [1,0,1,1,1,0,1];
+    for (let pass = 0; pass < 2; pass++){
+      for (let a = 0; a < size; a++){
+        for (let b = 0; b <= size - 7; b++){
+          let hit = true;
+          for (let k = 0; k < 7; k++){
+            const v = pass ? at(b + k, a) : at(a, b + k);
+            if (v !== look[k]){ hit = false; break; }
+          }
+          if (!hit) continue;
+          let quietBefore = true, quietAfter = true;
+          for (let k = 1; k <= 4; k++){
+            const i = b - k, j = b + 6 + k;
+            if (i >= 0 && (pass ? at(i, a) : at(a, i))) quietBefore = false;
+            if (j < size && (pass ? at(j, a) : at(a, j))) quietAfter = false;
+          }
+          if (quietBefore || quietAfter) p += 40;
+        }
+      }
+    }
+    // rule 4: how far off half the pattern is dark
+    let dark = 0;
+    for (let i = 0; i < m.length; i++) dark += m[i];
+    const pct = dark * 100 / m.length;
+    p += Math.floor(Math.abs(pct - 50) / 5) * 10;
+    return p;
+  }
+
+  function build(text){
+    const bytes = typeof TextEncoder !== "undefined"
+      ? Array.from(new TextEncoder().encode(text))
+      : Array.from(unescape(encodeURIComponent(text))).map(ch => ch.charCodeAt(0));
+
+    let v = -1;
+    for (let i = 0; i < DATA.length; i++){
+      if (4 + 8 + bytes.length * 8 <= DATA[i] * 8){ v = i; break; }
+    }
+    if (v < 0) throw new Error("too much text for a small QR code");
+
+    /* the data, as bits, then padded out to the exact capacity */
+    const bits = [];
+    const push = (val, n) => { for (let i = n - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+    push(4, 4);                  // byte mode
+    push(bytes.length, 8);       // how many, 8 bits for versions 1-9
+    for (const b of bytes) push(b, 8);
+    const room = DATA[v] * 8;
+    for (let i = 0; i < 4 && bits.length < room; i++) bits.push(0);
+    while (bits.length % 8) bits.push(0);
+    const words = [];
+    for (let i = 0; i < bits.length; i += 8){
+      let b = 0;
+      for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+      words.push(b);
+    }
+    const filler = [0xEC, 0x11];
+    for (let k = 0; words.length < DATA[v]; k++) words.push(filler[k % 2]);
+    const all = words.concat(remainder(words, ECC[v]));
+
+    const size = 17 + 4 * (v + 1);
+    const m = new Uint8Array(size * size);
+    const fixed = new Uint8Array(size * size);   // 1 where the pattern is not data
+    const set = (r, c, val) => { m[r * size + c] = val; fixed[r * size + c] = 1; };
+
+    /* the three big squares, with their light border */
+    function finder(r0, c0){
+      for (let r = -1; r <= 7; r++)
+        for (let c = -1; c <= 7; c++){
+          const r1 = r0 + r, c1 = c0 + c;
+          if (r1 < 0 || c1 < 0 || r1 >= size || c1 >= size) continue;
+          const ring = (r >= 0 && r <= 6 && c >= 0 && c <= 6) &&
+                       (r === 0 || r === 6 || c === 0 || c === 6 ||
+                        (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+          set(r1, c1, ring ? 1 : 0);
+        }
+    }
+    finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+    /* the small square, only from version 2 up */
+    if (v >= 1){
+      const a = size - 7;
+      for (let r = -2; r <= 2; r++)
+        for (let c = -2; c <= 2; c++)
+          set(a + r, a + c, (Math.abs(r) === 2 || Math.abs(c) === 2 || (r === 0 && c === 0)) ? 1 : 0);
+    }
+
+    /* the dotted lines joining the big squares */
+    for (let i = 8; i < size - 8; i++){
+      const v2 = i % 2 === 0 ? 1 : 0;
+      set(6, i, v2); set(i, 6, v2);
+    }
+    set(size - 8, 8, 1);        // the one module that is always dark
+
+    /* hold space for the fifteen bits that say which mask was used */
+    for (let i = 0; i <= 8; i++){
+      if (i !== 6){ set(8, i, 0); set(i, 8, 0); }
+    }
+    for (let i = 0; i < 8; i++){ set(8, size - 1 - i, 0); set(size - 1 - i, 8, 0); }
+
+    /* the data, snaked up and down two columns at a time from the right */
+    const dataBits = [];
+    for (const w of all) for (let i = 7; i >= 0; i--) dataBits.push((w >> i) & 1);
+    let bi = 0, row = size - 1, dir = -1;
+    for (let col = size - 1; col > 0; col -= 2){
+      if (col === 6) col--;                  // step over the dotted line
+      for (;;){
+        for (let k = 0; k < 2; k++){
+          const cc = col - k;
+          if (!fixed[row * size + cc]){
+            m[row * size + cc] = bi < dataBits.length ? dataBits[bi] : 0;
+            bi++;
+          }
+        }
+        row += dir;
+        if (row < 0 || row >= size){ row -= dir; dir = -dir; break; }
+      }
+    }
+
+    /* try all eight masks and keep the one that scans best */
+    let best = null, bestScore = Infinity;
+    for (let mask = 0; mask < 8; mask++){
+      const t = Uint8Array.from(m);
+      for (let r = 0; r < size; r++)
+        for (let c = 0; c < size; c++)
+          if (!fixed[r * size + c] && MASKS[mask](r, c)) t[r * size + c] ^= 1;
+      putFormat(t, size, mask);
+      const score = penalty(t, size);
+      if (score < bestScore){ bestScore = score; best = t; }
+    }
+    return { size, modules: best };
+  }
+
+  /* fifteen bits: two for the level, three for the mask, ten of checking.
+     They appear twice, once beside the top-left square and once split
+     between the other two, and the two copies are laid out differently. */
+  function putFormat(t, size, mask){
+    const data = (0x01 << 3) | mask;        // 01 is level L
+    let d = data << 10;
+    for (let i = 14; i >= 10; i--) if ((d >> i) & 1) d ^= 0x537 << (i - 10);
+    const val = ((data << 10) | (d & 0x3FF)) ^ 0x5412;
+    for (let i = 0; i < 15; i++){
+      const bit = (val >> i) & 1;
+      // down the left edge of the top-left square
+      if (i < 6)      t[i * size + 8] = bit;
+      else if (i < 8) t[(i + 1) * size + 8] = bit;
+      else            t[(size - 15 + i) * size + 8] = bit;
+      // along the bottom edge of it
+      if (i < 8)       t[8 * size + (size - i - 1)] = bit;
+      else if (i === 8) t[8 * size + 7] = bit;
+      else              t[8 * size + (14 - i)] = bit;
+    }
+    t[(size - 8) * size + 8] = 1;           // always dark
+  }
+
+  return { build };
+})();
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════
    THE GAME
 
    Aliens on a table. Energy grows by one every turn, so the
@@ -1457,14 +1710,37 @@ $("go-net").addEventListener("click", () => {
 $("room-back").addEventListener("click", () => { SFX.tap(); show("s-title"); });
 $("wait-back").addEventListener("click", () => { SFX.tap(); stopReading(); show("s-title"); });
 
-$("join").addEventListener("click", () => {
-  const room = $("roomname").value.trim().toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
-  if (room.length < 3){
-    $("room-note").textContent = "That name is too short. Try a longer one.";
-    return;
+/* The square code holds the address of this very page with the room name on
+   the end, so pointing a camera at it opens the game already in the room.
+   The pattern is worked out in code above, because nothing in this repo may
+   be fetched from the internet. */
+function drawJoinCode(room){
+  const box = $("joinbox"), cv = $("joincode");
+  const link = location.origin + location.pathname + "#r=" + room;
+  try {
+    const q = QR.build(link);
+    const quiet = 3, scale = Math.max(3, Math.floor(232 / (q.size + quiet * 2)));
+    const side = (q.size + quiet * 2) * scale;
+    cv.width = side; cv.height = side;
+    const ctx = cv.getContext("2d");
+    ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, side, side);
+    ctx.fillStyle = "#000000";          // plain black on white scans best
+    for (let r = 0; r < q.size; r++)
+      for (let c = 0; c < q.size; c++)
+        if (q.modules[r * q.size + c])
+          ctx.fillRect((c + quiet) * scale, (r + quiet) * scale, scale, scale);
+    box.hidden = false;
+  } catch (e){
+    box.hidden = true;                  // no code at all beats a broken one
   }
-  SFX.tap();
+}
+
+function tidyRoomName(raw){
+  return String(raw).trim().toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+}
+
+function joinRoom(room){
   G.mode = "net";
   G.room = room;
   G.me = "p" + Date.now().toString(36) + (Math.random() * 1e6 | 0).toString(36);
@@ -1473,9 +1749,20 @@ $("join").addEventListener("click", () => {
   joined.length = 0;
   $("wait-room").textContent = room;
   $("wait-note").textContent = "Looking for them…";
+  drawJoinCode(room);
   show("s-wait");
   sendMove({ t: "join", id: G.me });
   startReading();
+}
+
+$("join").addEventListener("click", () => {
+  const room = tidyRoomName($("roomname").value);
+  if (room.length < 3){
+    $("room-note").textContent = "That name is too short. Try a longer one.";
+    return;
+  }
+  SFX.tap();
+  joinRoom(room);
 });
 $("roomname").addEventListener("keydown", e => { if (e.key === "Enter") $("join").click(); });
 
@@ -1506,6 +1793,10 @@ $("again").addEventListener("click", () => {
 if (location.protocol === "file:"){
   $("go-net").disabled = true;
   $("net-note").textContent = "Two computers only works on the website, not on the file.";
+} else {
+  /* arrived by scanning the square code? the room name is in the address */
+  const scanned = /[#&]r=([A-Za-z0-9-]{3,40})/.exec(location.hash || "");
+  if (scanned) joinRoom(tidyRoomName(scanned[1]));
 }
 
 let resizeTimer;

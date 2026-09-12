@@ -55,6 +55,23 @@ at Armour survives:
 - **One boss** hides in each player's deck. Gold frame, scary name, huge
   numbers, and it costs nearly all your energy.
 
+## Joining by pointing a camera at the screen
+
+The waiting screen shows a square code. It holds the address of the page with
+the room name stuck on the end, so pointing a phone camera at it opens the game
+already in that room. Typing the name still works for anyone who would rather.
+
+The code is worked out in code, right here in `index.html`, because nothing in
+this repo may be fetched from the internet. It does byte mode at correction
+level L in versions 1 to 5, which are all a single block of data and so skip
+the interleaving entirely. Version 5 carries 106 characters and the link needs
+about sixty.
+
+It was checked by decoding it rather than by looking at it: seven strings,
+including the real link and a 105-character one, were drawn and then read back
+with an independent decoder, and all seven came back byte for byte. The one on
+the waiting screen was then decoded straight off the rendered canvas.
+
 ## Two computers, without either one being in charge
 
 Both pages build **the same decks from the room name**, so no cards are ever
@@ -145,7 +162,8 @@ a picture is made. That is a change to the machine that paints them, not to
 this game, so it needs Artur. **Recommended: shave the edges.** Until then the
 pictures are fine to use and nobody has spotted it while playing.
 
-**Adam asked for two more things** and they are being worked on: a QR code so
-the other player can join a room by pointing a phone at the screen, and "full
-multiplayer", which needs Adam to say whether he means more than two players
-or something else.
+**Adam asked for "full multiplayer"** and it is not clear what he means. It
+could be more than two players, which is a real rules change: whose turn it is,
+who you are allowed to hit, and what happens when one player is knocked out.
+Or it could be a proper lobby showing who has joined. He needs to say which
+before it gets built, so nothing has been started.
