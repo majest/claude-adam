@@ -43,6 +43,29 @@ internet. Every noise is built in code with the Web Audio API: slimes squelch
 beep two square notes, bugs chirp three rising ticks, and the boss growls a low
 sawtooth. Winning plays a little arpeggio.
 
+## Still to decide
+
+Adam asked for a Hearthstone-style version. Two questions were open when the
+last session ended, and the answers change what gets built, so nothing has been
+started:
+
+1. **Keep this game and add the new one beside it, or replace this one?**
+   Adding is safer. Nothing that already works gets lost, and the title screen
+   picks which to play.
+2. **Two computers, or one screen?** Two computers is possible now. The move
+   service in `BUILDING.md` is turn-based, which suits a card game, and it has
+   been checked from a cloud session. One screen is simpler and needs no
+   internet at all.
+
+A Hearthstone-style game means cards held in a hand, a mana cost that grows
+each turn, creatures placed on a board that fight, and a health total that ends
+the game when it reaches zero. That is a new game rather than a change to this
+one, which is why it would live alongside.
+
+Also waiting: the painted portraits in `art/PROMPTS.md`. They need a session on
+Artur's own computer, because the machine that paints them is not reachable
+from anywhere else, and Artur has to agree to the size first.
+
 ## Seeing every card
 
 After the cards are dealt the whole deck is laid out, boss first, so you can see
