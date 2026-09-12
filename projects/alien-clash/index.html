@@ -390,23 +390,32 @@ const SUF = ["blax","nok","zoid","thor","gump","ax","ix","ulon","oid","gar","mit
 
 const SPECIES = {
   slime: {
-    hues: [95, 120, 145, 165, 285, 75],
-    names: ["Goo Hulk","Jelly Fiend","Ooze Lord","Slime Pup","Bog Blob","Mucus Beast","Drip Titan"],
+    hues: [95, 132, 168, 285, 192, 48],
+    names: ["Goo Hulk","Jelly Fiend","Ooze Lord","Slime Pup","Bog Blob","Mucus Beast","Drip Titan",
+            "Puddle Brute","Gloop Knight","Swamp Whelp","Blob Warden","Sludge Crawler","Jam Golem"],
     flavour: ["Eats socks.","Leaves a trail everywhere.","Smells like old cheese.","Once ate a bus.",
-              "Afraid of bubbles.","Wobbles when it sneezes.","Sticks to the ceiling.","Tastes like lime. Sadly."]
+              "Afraid of bubbles.","Wobbles when it sneezes.","Sticks to the ceiling.","Tastes like lime. Sadly.",
+              "Dissolves spoons.","Hums in the bath.","Cannot be folded.","Was bigger last week.",
+              "Sneezes glitter.","Lost its left eye somewhere."]
   },
   mech: {
     hues: [205, 220, 235, 25, 0, 190],
-    names: ["Rust Unit","Iron Sentry","Cog Drone","Steel Hunter","Bolt Titan","Scrap Warden","Gear Brute"],
+    names: ["Rust Unit","Iron Sentry","Cog Drone","Steel Hunter","Bolt Titan","Scrap Warden","Gear Brute",
+            "Tin Marshal","Spark Walker","Piston Guard","Wrench Lord","Signal Ghost","Anvil Mk II"],
     flavour: ["Runs on very old batteries.","Beeps when it is happy.","Has 400 spare parts.",
               "Forgot why it came here.","Hums much too loudly.","Goes rusty in the rain.",
-              "Counts everything twice.","Cannot open jars."]
+              "Counts everything twice.","Cannot open jars.","Squeaks going round corners.",
+              "Dreams in beeps.","Needs oiling. Badly.","Salutes lamp posts.",
+              "Has one wheel too few.","Reboots when startled."]
   },
   bug: {
     hues: [22, 38, 300, 330, 258, 50],
-    names: ["Hive Raider","Shell Knight","Spike Crawler","Wing Stalker","Carapax","Swarm Brute","Claw Scout"],
+    names: ["Hive Raider","Shell Knight","Spike Crawler","Wing Stalker","Carapax","Swarm Brute","Claw Scout",
+            "Husk Rider","Mandible Duke","Chitin Guard","Drone Lancer","Pincer Fiend","Beetle Baron"],
     flavour: ["Has eleven knees.","Clicks all night long.","Can lift a car.","Sleeps upside down.",
-              "Collects shiny rocks.","Hates being tickled.","Walks on walls.","Is scared of moths."]
+              "Collects shiny rocks.","Hates being tickled.","Walks on walls.","Is scared of moths.",
+              "Chews through fences.","Buzzes the wrong note.","Fits in a teacup. Just.",
+              "Waves at aeroplanes.","Has a favourite leaf.","Naps in your shoe."]
   }
 };
 
@@ -440,6 +449,16 @@ function shareOut(r, lo, hi){
   return { power: v[0], speed: v[1], brains: v[2], armour: v[3] };
 }
 
+function alienName(r){
+  for (let tries = 0; tries < 8; tries++){
+    const a = r.pick(PRE), b = r.pick(SUF);
+    const mid = (a.length + b.length <= 8 && r.chance(.4)) ? r.pick(["a","o","u","ee","i"]) : "";
+    const name = a + mid + b;
+    if (name.length <= 10) return name;
+  }
+  return r.pick(PRE) + r.pick(["ax","ok","ix","us"]);
+}
+
 function makeCard(seed){
   const r = new Rng("alien|" + seed);
   const spKey = r.pick(["slime", "mech", "bug"]);
@@ -451,7 +470,7 @@ function makeCard(seed){
   const hue = r.pick(sp.hues) + r.int(-12, 12);
   return {
     seed, spKey, rarity,
-    name: r.pick(PRE) + (r.chance(.35) ? r.pick(["a","o","u","ee","i"]) : "") + r.pick(SUF),
+    name: alienName(r),
     species: r.pick(sp.names),
     flavour: r.pick(sp.flavour),
     stats: shareOut(r, rarity.budget[0], rarity.budget[1]),
@@ -535,7 +554,7 @@ function drawSlime(ctx, cx, cy, u, r, card){
   const pts = [], n = 15;
   for (let i = 0; i < n; i++){
     const a = i / n * TAU;
-    const rad = R * (1 + r.f(-.13, .13) + Math.sin(a * 3 + card.art) * .06);
+    const rad = R * (1 + r.f(-.16, .16) + Math.sin(a * 3 + card.art) * .11);
     pts.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad * 1.06]);
   }
   blobPath(ctx, pts);
@@ -560,10 +579,10 @@ function drawSlime(ctx, cx, cy, u, r, card){
   for (let i = 0; i < eyes; i++){
     const t = eyes === 1 ? .5 : i / (eyes - 1);
     const ex = cx + (t - .5) * R * 1.25 + r.f(-R * .08, R * .08);
-    const ey = cy - R * r.f(.15, .5);
-    const er = u * (eyes > 3 ? .045 : .07) * r.f(.85, 1.15);
+    const ey = cy - R * r.f(.05, .58) - Math.abs(t - .5) * R * -.25;
+    const er = u * (eyes > 3 ? .05 : eyes > 1 ? .075 : .1) * r.f(.88, 1.12);
     if (r.chance(.3)){                                 // on a stalk
-      const sy = ey - R * r.f(.55, .95);
+      const sy = ey - R * r.f(.34, .62);
       ctx.strokeStyle = hsl(H, 66, 42); ctx.lineWidth = er * .5; ctx.lineCap = "round";
       ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex, sy); ctx.stroke();
       eye(ctx, ex, sy, er, look);
@@ -598,7 +617,7 @@ function drawMech(ctx, cx, cy, u, r, card){
 
   for (let i = 0; i < r.int(1, 3); i++){               // antennae
     const ax = cx + (i ? 1 : -1) * W * r.f(.2, .4), ay = cy - Hh * .5;
-    const tx = ax + r.f(-u * .08, u * .08), ty = ay - u * r.f(.14, .26);
+    const tx = ax + r.f(-u * .07, u * .07), ty = ay - u * r.f(.09, .17);
     ctx.strokeStyle = hsl(H, 20, 55); ctx.lineWidth = u * .016; ctx.lineCap = "round";
     ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(tx, ty); ctx.stroke();
     ctx.fillStyle = hsl(H + 40, 95, 66); dot(ctx, tx, ty, u * .028);
@@ -636,16 +655,23 @@ function drawMech(ctx, cx, cy, u, r, card){
     const side = i % 2 ? 1 : -1;
     dot(ctx, cx + side * W * .42, cy - Hh * .34 + Math.floor(i / 2) * Hh * .24, u * .011);
   }
+  roundBox(ctx, cx - W * .3, cy + Hh * .16, W * .6, Hh * .16, u * .015);    // mouth grille
+  ctx.fillStyle = "#0C0916"; ctx.fill();
+  ctx.strokeStyle = hsla(H, 40, 70, .35); ctx.lineWidth = u * .006; ctx.stroke();
+  ctx.fillStyle = hsla(H, 30, 78, .5);
+  for (let i = 0; i < 5; i++)
+    ctx.fillRect(cx - W * .26 + i * W * .13, cy + Hh * .185, u * .012, Hh * .11);
+
   ctx.strokeStyle = hsla(H, 30, 12, .6); ctx.lineWidth = u * .01;           // vents
   for (let i = 0; i < 3; i++){
-    const gy = cy + Hh * (.22 + i * .07);
+    const gy = cy + Hh * (.375 + i * .045);
     ctx.beginPath(); ctx.moveTo(cx - W * .26, gy); ctx.lineTo(cx + W * .26, gy); ctx.stroke();
   }
 }
 
 /* ---------- bug ---------- */
 function drawBug(ctx, cx, cy, u, r, card){
-  const H = card.hue, bw = u * .3, bh = u * .36;
+  const H = card.hue, bw = u * .25, bh = u * .35;
 
   if (r.chance(.55)){                                  // wings
     for (const s of [-1, 1]){
@@ -660,10 +686,10 @@ function drawBug(ctx, cx, cy, u, r, card){
   for (const s of [-1, 1]){                            // legs
     for (let i = 0; i < 3; i++){
       const hy = cy - bh * .25 + i * bh * .36;
-      const kx = cx + s * bw * r.f(1.25, 1.6), ky = hy + bh * r.f(.1, .3);
-      const fx = kx + s * bw * r.f(.25, .5), fy = ky + bh * r.f(.35, .6);
+      const kx = cx + s * bw * r.f(1.7, 2.1), ky = hy + bh * r.f(.02, .2);
+      const fx = kx + s * bw * r.f(.3, .6), fy = ky + bh * r.f(.4, .65);
       ctx.strokeStyle = hsl(H, 55, 30); ctx.lineWidth = u * .017; ctx.lineCap = "round";
-      ctx.beginPath(); ctx.moveTo(cx + s * bw * .6, hy); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + s * bw * .8, hy); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
     }
   }
 
@@ -688,14 +714,14 @@ function drawBug(ctx, cx, cy, u, r, card){
   ctx.restore();
 
   if (r.chance(.6)){                                   // back spikes
-    ctx.fillStyle = hsl(H, 45, 78);
+    ctx.fillStyle = hsl(H, 58, 44);
     for (let i = 0; i < 4; i++){
-      const sy = cy - bh * .3 + i * bh * .3, sw = u * .03;
+      const sy = cy - bh * .3 + i * bh * .3, sw = u * .022;
       ctx.beginPath();
-      ctx.moveTo(cx - bw * .95, sy - sw); ctx.lineTo(cx - bw * 1.3, sy);
+      ctx.moveTo(cx - bw * .95, sy - sw); ctx.lineTo(cx - bw * 1.18, sy);
       ctx.lineTo(cx - bw * .95, sy + sw); ctx.fill();
       ctx.beginPath();
-      ctx.moveTo(cx + bw * .95, sy - sw); ctx.lineTo(cx + bw * 1.3, sy);
+      ctx.moveTo(cx + bw * .95, sy - sw); ctx.lineTo(cx + bw * 1.18, sy);
       ctx.lineTo(cx + bw * .95, sy + sw); ctx.fill();
     }
   }
@@ -726,7 +752,7 @@ function drawBug(ctx, cx, cy, u, r, card){
   for (const s of [-1, 1]){
     ctx.beginPath();
     ctx.moveTo(cx + s * hr * .3, hy - hr * .6);
-    ctx.quadraticCurveTo(cx + s * hr * 1.1, hy - hr * 1.4, cx + s * hr * .5, hy - hr * 1.9);
+    ctx.quadraticCurveTo(cx + s * hr * 1.0, hy - hr * 1.1, cx + s * hr * .5, hy - hr * 1.5);
     ctx.stroke();
   }
 }
@@ -743,6 +769,499 @@ function paintCard(canvas, card){
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const r = new Rng("art|" + card.art);
   drawSpace(ctx, w, h, card, r);
-  ARTIST[card.spKey](ctx, w / 2, h * .54, Math.min(w, h) * 1.12, r, card);
+  ARTIST[card.spKey](ctx, w / 2, h * .58, Math.min(w * .92, h * .98) * 1.16, r, card);
 }
+</script>
+
+<style>
+/* ---------- boss frame, mode picker, mute, compact arena cards ---------- */
+:root{ --boss:#FFC83D }
+
+.card.boss{
+  border-color:#FFD873;
+  box-shadow:
+    0 0 0 2px rgba(255,200,61,.5),
+    0 0 34px rgba(255,182,30,.45),
+    0 10px 30px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.25);
+  animation:bossglow 2.4s ease-in-out infinite;
+}
+@keyframes bossglow{
+  50%{box-shadow:0 0 0 3px rgba(255,214,110,.75), 0 0 52px rgba(255,182,30,.7),
+      0 10px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.25)}
+}
+.card.boss .card-name{
+  background:linear-gradient(180deg,#FFF3CF,#FFC83D 60%,#C98A00);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+
+.modes{display:flex;gap:10px}
+.modes button{
+  font-family:"Chakra Petch",sans-serif;font-weight:700;
+  display:flex;flex-direction:column;gap:2px;align-items:center;
+  min-width:118px;min-height:66px;padding:10px 16px;
+  border-radius:14px;cursor:pointer;color:var(--ink);
+  background:rgba(255,255,255,.06);border:2px solid var(--edge);
+  transition:all .15s;
+}
+.modes button strong{font-family:"Bungee",Impact,sans-serif;font-weight:400;font-size:16px}
+.modes button small{font-size:11.5px;color:var(--ink-2);letter-spacing:.03em}
+.modes button[aria-pressed="true"]{
+  background:linear-gradient(180deg,#8B5CF6,#6D28D9);border-color:#C4A0FF;
+  box-shadow:0 0 0 4px rgba(139,92,246,.25);
+}
+.modes button[aria-pressed="true"] small{color:#E9DDFF}
+.modes button:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
+
+#mute{
+  position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:9;
+  width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:19px;line-height:1;
+  background:rgba(0,0,0,.4);border:1px solid var(--edge);color:var(--ink);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+#mute:focus-visible{outline:3px solid #F5B324;outline-offset:3px}
+
+/* arena cards drop the small print so four of them fit a phone screen */
+.arena .card-flavour{display:none}
+.arena .card{max-width:min(220px,43vw);padding:7px;gap:5px}
+.arena .card-name{font-size:12.5px}
+.arena .stat{padding:4px 6px}
+.arena .stat b{font-size:14px}
+.arena .stat span{font-size:9px}
+.arena .card-species{font-size:9.5px}
+.arena .pip{font-size:8px;padding:2px 5px}
+@media (min-width:760px){
+  .arena .card{max-width:220px}
+  .arena .card-name{font-size:14px}
+  .arena .stat b{font-size:16px}
+}
+</style>
+
+<button id="mute" aria-pressed="false" aria-label="Turn sound off" title="Sound on or off">🔊</button>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   NOISES — made in code, because a project here cannot fetch
+   sound files from the internet.
+   ════════════════════════════════════════════════════════════ */
+let AC = null, muted = false;
+try { muted = localStorage.getItem("alien-clash-muted") === "1"; } catch (e) {}
+
+function audio(){
+  if (!AC){
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+    AC = new Ctor();
+  }
+  if (AC.state === "suspended") AC.resume();
+  return AC;
+}
+function tone(o){
+  if (muted) return;
+  const c = audio(); if (!c) return;
+  const t0 = c.currentTime + (o.delay || 0);
+  const dur = o.dur || .16;
+  const osc = c.createOscillator(), g = c.createGain();
+  osc.type = o.type || "square";
+  osc.frequency.setValueAtTime(o.freq, t0);
+  if (o.to) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.to), t0 + dur);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(o.gain === undefined ? .16 : o.gain, t0 + .012);
+  g.gain.exponentialRampToValueAtTime(.0005, t0 + dur);
+  osc.connect(g).connect(c.destination);
+  osc.start(t0); osc.stop(t0 + dur + .03);
+}
+function hiss(dur, gain, freq, delay){
+  if (muted) return;
+  const c = audio(); if (!c) return;
+  const n = Math.floor(c.sampleRate * dur);
+  const buf = c.createBuffer(1, n, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const src = c.createBufferSource(); src.buffer = buf;
+  const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = freq; bp.Q.value = 1.2;
+  const g = c.createGain(); g.gain.value = gain;
+  src.connect(bp).connect(g).connect(c.destination);
+  src.start(c.currentTime + (delay || 0));
+}
+const SFX = {
+  flip(){ tone({ freq: 520, to: 900, dur: .07, type: "triangle", gain: .10 }); },
+  tap(){  tone({ freq: 660, dur: .05, type: "triangle", gain: .08 }); },
+  slime(){ tone({ freq: 430, to: 80, dur: .24, type: "sine", gain: .22 }); hiss(.13, .05, 700, .02); },
+  mech(){ tone({ freq: 880, dur: .07, gain: .11 }); tone({ freq: 1320, dur: .07, delay: .09, gain: .11 }); },
+  bug(){ for (let i = 0; i < 3; i++) tone({ freq: 1500 + i * 320, dur: .04, type: "sawtooth", gain: .07, delay: i * .055 }); },
+  win(){ [523, 659, 784, 1047].forEach((f, i) => tone({ freq: f, dur: .13, type: "triangle", gain: .13, delay: i * .075 })); },
+  tie(){ tone({ freq: 400, dur: .12, type: "sine", gain: .13 }); tone({ freq: 300, dur: .18, type: "sine", gain: .13, delay: .13 }); },
+  boss(){ tone({ freq: 120, to: 62, dur: .7, type: "sawtooth", gain: .2 }); hiss(.5, .05, 200, .05); },
+  out(){ [392, 311, 233].forEach((f, i) => tone({ freq: f, dur: .18, type: "triangle", gain: .12, delay: i * .13 })); },
+  fanfare(){ [523, 659, 784, 1047, 1319].forEach((f, i) => tone({ freq: f, dur: .22, type: "square", gain: .1, delay: i * .1 })); }
+};
+
+const muteBtn = document.getElementById("mute");
+function paintMute(){
+  muteBtn.textContent = muted ? "🔇" : "🔊";
+  muteBtn.setAttribute("aria-pressed", String(muted));
+  muteBtn.setAttribute("aria-label", muted ? "Turn sound on" : "Turn sound off");
+}
+muteBtn.addEventListener("click", () => {
+  muted = !muted;
+  try { localStorage.setItem("alien-clash-muted", muted ? "1" : "0"); } catch (e) {}
+  paintMute();
+  if (!muted) SFX.tap();
+});
+paintMute();
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   THE BOSS — exactly one hides in every deck
+   ════════════════════════════════════════════════════════════ */
+const BOSS = { key: "boss", label: "Boss", budget: [320, 356], foil: true };
+const BOSS_NAMES = ["Skullgrax","Doomblorb","Vorethrax","Gnashulon","Xarnoth","Gribbik","Malgroth","Zethmaw"];
+const BOSS_TITLES = {
+  slime: ["Elder Ooze","The Great Sludge","Swamp Tyrant"],
+  mech:  ["Doom Engine","War Machine","Iron Overlord"],
+  bug:   ["Hive Emperor","Ancient Horror","Void Tyrant"]
+};
+const BOSS_FLAVOUR = ["Ate the last boss.","Nobody knows where it came from.","Has never lost. Until today.",
+                      "Its shadow is longer than a bus.","Snores in three languages.","Older than this galaxy."];
+function makeBoss(seed){
+  const c = makeCard(seed), r = new Rng("boss|" + seed);
+  c.rarity = BOSS;
+  c.stats = shareOut(r, BOSS.budget[0], BOSS.budget[1]);
+  c.name = r.pick(BOSS_NAMES);
+  c.species = r.pick(BOSS_TITLES[c.spKey]);
+  c.flavour = r.pick(BOSS_FLAVOUR);
+  return c;
+}
+
+/* ════════════════════════════════════════════════════════════
+   THE GAME
+   ════════════════════════════════════════════════════════════ */
+const MODES = {
+  quick: { label: "Quick", per: 5,  cap: 16, note: "5 cards each" },
+  long:  { label: "Long",  per: 10, cap: 30, note: "10 cards each" }
+};
+const PCOLS = ["var(--p1)", "var(--p2)", "var(--p3)", "var(--p4)"];
+const S = { n: 4, mode: "quick", players: [], pot: [], leader: 0, round: 1, cap: 20 };
+
+const $ = id => document.getElementById(id);
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.removeAttribute("data-on"));
+  $(id).setAttribute("data-on", "");
+  window.scrollTo(0, 0);
+}
+
+/* ---------- card elements ---------- */
+let paints = [];
+function cardEl(card, onKey){
+  const el = document.createElement("div");
+  el.className = "card rarity-" + card.rarity.key +
+                 (card.rarity.foil ? " foil" : "") +
+                 (card.rarity.key === "boss" ? " boss" : "");
+  el.style.setProperty("--accent", "var(--" + card.rarity.key + ")");
+  el.innerHTML =
+    '<div class="card-head"><span class="card-name"></span><span class="pip"></span></div>' +
+    '<canvas class="art"></canvas>' +
+    '<div class="card-species"></div>' +
+    '<div class="stats">' + POWERS.map(p =>
+      '<div class="stat' + (onKey === p.key ? " on" : "") + '"><span>' + p.label +
+      '</span><b>' + card.stats[p.key] + "</b></div>").join("") +
+    '</div><div class="card-flavour"></div>';
+  el.querySelector(".card-name").textContent = card.name;
+  el.querySelector(".pip").textContent = card.rarity.label;
+  el.querySelector(".card-species").textContent = card.species;
+  el.querySelector(".card-flavour").textContent = card.flavour;
+  paints.push([el.querySelector(".art"), card]);
+  return el;
+}
+function flushPaints(){
+  requestAnimationFrame(() => { for (const [cv, card] of paints) paintCard(cv, card); });
+}
+function put(hostId, node){
+  const host = $(hostId);
+  host.innerHTML = "";
+  if (node) host.appendChild(node);
+}
+
+/* ---------- scoreboard ---------- */
+function board(hostId){
+  const host = $(hostId);
+  host.innerHTML = "";
+  S.players.forEach((p, i) => {
+    const c = document.createElement("span");
+    const dead = p.hand.length === 0;
+    c.className = "chip" + (i === S.leader && !dead ? " lead" : "") + (dead ? " dead" : "");
+    c.style.setProperty("--pc", p.col);
+    c.innerHTML = '<i></i><span></span><u></u>';
+    c.querySelector("span").textContent = p.name;
+    c.querySelector("u").textContent = dead ? "out" : p.hand.length + (p.hand.length === 1 ? " card" : " cards");
+    host.appendChild(c);
+  });
+  if (S.pot.length){
+    const c = document.createElement("span");
+    c.className = "chip";
+    c.style.setProperty("--pc", "var(--legend)");
+    c.innerHTML = '<i></i><span></span>';
+    c.querySelector("span").textContent = "middle: " + S.pot.length;
+    host.appendChild(c);
+  }
+}
+
+/* ---------- deck ---------- */
+function shuffle(a){
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function buildDeck(total){
+  const base = (Math.random() * 1e9 | 0) + "-" + Date.now();
+  const cards = [];
+  for (let i = 0; i < total; i++) cards.push(makeCard(base + "-" + i));
+  cards[Math.floor(Math.random() * total)] = makeBoss(base + "-boss");
+  return shuffle(cards);
+}
+
+/* ---------- flow ---------- */
+function startGame(){
+  const M = MODES[S.mode];
+  S.players = [];
+  for (let i = 0; i < S.n; i++) S.players.push({ name: "Player " + (i + 1), col: PCOLS[i], hand: [] });
+  const deck = buildDeck(S.n * M.per);
+  deck.forEach((c, i) => S.players[i % S.n].hand.push(c));
+  S.pot = []; S.leader = 0; S.round = 1; S.cap = M.cap;
+  goPass();
+}
+
+const living = () => S.players.filter(p => p.hand.length > 0);
+
+function goPass(){
+  if (living().length <= 1) return gameOver();
+  if (S.round > S.cap) return gameOver();
+  let guard = 0;
+  while (S.players[S.leader].hand.length === 0 && guard++ < 8) S.leader = (S.leader + 1) % S.n;
+  const p = S.players[S.leader];
+  $("pass-who").textContent = p.name + ", it's your turn";
+  $("pass-who").style.color = p.col;
+  $("pass-note").textContent = "Round " + S.round + " of " + S.cap +
+    ". Only you should see this card, so everyone else look away!";
+  board("pass-board");
+  show("s-pass");
+}
+
+function goPick(){
+  paints = [];
+  const p = S.players[S.leader], card = p.hand[0];
+  $("pick-who").textContent = p.name;
+  $("pick-who").style.color = p.col;
+  put("pick-card", cardEl(card));
+  const host = $("powers");
+  host.innerHTML = "";
+  POWERS.forEach(pw => {
+    const b = document.createElement("button");
+    b.className = "power";
+    b.type = "button";
+    b.innerHTML = "<em></em><b></b>";
+    b.querySelector("em").textContent = pw.label;
+    b.querySelector("b").textContent = card.stats[pw.key];
+    b.addEventListener("click", () => { SFX.flip(); doReveal(pw.key); });
+    host.appendChild(b);
+  });
+  show("s-pick");
+  flushPaints();
+  SFX[card.spKey === "mech" ? "mech" : card.spKey === "slime" ? "slime" : "bug"]();
+}
+
+function doReveal(key){
+  paints = [];
+  const label = POWERS.find(p => p.key === key).label;
+  const entries = [];
+  S.players.forEach((p, i) => { if (p.hand.length) entries.push({ p, i, card: p.hand[0] }); });
+
+  const best = Math.max.apply(null, entries.map(e => e.card.stats[key]));
+  const winners = entries.filter(e => e.card.stats[key] === best);
+  const tie = winners.length > 1;
+
+  const arena = $("arena");
+  arena.innerHTML = "";
+  arena.style.setProperty("--cols", String(Math.min(4, entries.length)));
+  entries.forEach(e => {
+    const slot = document.createElement("div");
+    slot.className = "slot" + (!tie && e === winners[0] ? " won" : "");
+    slot.style.setProperty("--pc", e.p.col);
+    const tag = document.createElement("span");
+    tag.className = "who";
+    tag.textContent = e.p.name + (e.i === S.leader ? " (chose)" : "");
+    slot.appendChild(tag);
+    slot.appendChild(cardEl(e.card, key));
+    if (!tie && e === winners[0]){
+      const cr = document.createElement("span");
+      cr.className = "crown";
+      cr.textContent = "👑";
+      slot.appendChild(cr);
+    }
+    arena.appendChild(slot);
+  });
+
+  const taken = entries.map(e => e.p.hand.shift());
+  const hadBoss = taken.some(c => c.rarity.key === "boss");
+  let msg;
+  if (tie){
+    S.pot.push.apply(S.pot, taken);
+    msg = "Tie on " + label + "! " + taken.length + " cards wait in the middle.";
+    S.leader = (S.leader + 1) % S.n;
+    SFX.tie();
+  } else {
+    const w = winners[0];
+    const haul = shuffle(taken.concat(S.pot));
+    S.pot = [];
+    w.p.hand.push.apply(w.p.hand, haul);
+    S.leader = w.i;
+    msg = w.p.name + " wins " + haul.length + (haul.length === 1 ? " card" : " cards") +
+          " with " + label + " " + best + "!";
+    if (hadBoss) SFX.boss();
+    SFX.win();
+  }
+  const justOut = S.players.filter(p => p.hand.length === 0 && !p.wasOut);
+  justOut.forEach(p => { p.wasOut = true; });
+  if (justOut.length && !tie) SFX.out();
+
+  $("verdict").textContent = (hadBoss ? "☠️ " : "") + msg;
+  board("reveal-board");
+  $("next").textContent = (living().length <= 1 || S.round >= S.cap) ? "See who won" : "Next round";
+  show("s-reveal");
+  flushPaints();
+}
+
+function gameOver(){
+  paints = [];
+  const ranked = S.players.slice().sort((a, b) => b.hand.length - a.hand.length);
+  const top = ranked[0];
+  const draw = ranked[1] && ranked[1].hand.length === top.hand.length;
+  $("over-title").innerHTML = "";
+  $("over-title").textContent = draw ? "It's a draw!" : top.name + " wins!";
+  $("over-title").style.color = draw ? "" : top.col;
+  $("over-note").textContent = draw
+    ? "Two of you finished with exactly the same pile. Rematch?"
+    : "Finished with " + top.hand.length + " cards after " + Math.min(S.round, S.cap) + " rounds.";
+  const best = top.hand.slice().sort((a, b) =>
+    (b.stats.power + b.stats.speed + b.stats.brains + b.stats.armour) -
+    (a.stats.power + a.stats.speed + a.stats.brains + a.stats.armour))[0];
+  put("over-card", best ? cardEl(best) : null);
+  board("over-board");
+  show("s-over");
+  flushPaints();
+  SFX.fanfare();
+}
+
+/* ---------- title screen ---------- */
+const countHost = $("count");
+[2, 3, 4].forEach(n => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = n;
+  b.setAttribute("aria-pressed", String(n === S.n));
+  b.setAttribute("aria-label", n + " players");
+  b.addEventListener("click", () => {
+    S.n = n;
+    [].forEach.call(countHost.children, c => c.setAttribute("aria-pressed", String(c === b)));
+    SFX.tap();
+  });
+  countHost.appendChild(b);
+});
+
+const modeHost = document.createElement("div");
+modeHost.className = "modes";
+modeHost.setAttribute("role", "group");
+modeHost.setAttribute("aria-label", "Game length");
+Object.keys(MODES).forEach(k => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.setAttribute("aria-pressed", String(k === S.mode));
+  b.innerHTML = "<strong></strong><small></small>";
+  b.querySelector("strong").textContent = MODES[k].label;
+  b.querySelector("small").textContent = MODES[k].note;
+  b.addEventListener("click", () => {
+    S.mode = k;
+    [].forEach.call(modeHost.children, c => c.setAttribute("aria-pressed", String(c === b)));
+    SFX.tap();
+  });
+  modeHost.appendChild(b);
+});
+countHost.insertAdjacentElement("afterend", modeHost);
+countHost.insertAdjacentHTML("afterend", '<p class="tiny">Quick game or long game?</p>');
+
+$("start").addEventListener("click", () => { SFX.flip(); startGame(); });
+$("peek").addEventListener("click", () => { SFX.flip(); goPick(); });
+$("next").addEventListener("click", () => {
+  SFX.tap();
+  S.round++;
+  if (living().length <= 1 || S.round > S.cap) gameOver(); else goPass();
+});
+$("again").addEventListener("click", () => { SFX.tap(); show("s-title"); });
+
+let rt;
+addEventListener("resize", () => {
+  clearTimeout(rt);
+  rt = setTimeout(() => { for (const [cv, card] of paints) paintCard(cv, card); }, 200);
+});
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   OPTIONAL EXTRA WORDS
+   The machine at home can write alien names and flavour lines
+   ahead of time into an "aliens.json" sitting next to this file.
+   Nothing here talks to a server: it reads a plain file, once,
+   and if the file is missing the game carries on exactly as it
+   is. Opening index.html by double-clicking blocks the read, so
+   absence has to be normal, not an error.
+
+   Shape:
+   {
+     "names":     ["Zorblax", ...],
+     "bossNames": ["Skullgrax", ...],
+     "titles":  { "slime": [...], "mech": [...], "bug": [...] },
+     "flavour": { "slime": [...], "mech": [...], "bug": [...] }
+   }
+   Every field is optional and anything unexpected is ignored.
+   ════════════════════════════════════════════════════════════ */
+(function(){
+  // keep the cards readable whatever the model writes
+  const clean = (v, maxChars) => Array.isArray(v)
+    ? v.filter(x => typeof x === "string")
+       .map(x => x.trim())
+       .filter(x => x.length > 0 && x.length <= maxChars)
+       .slice(0, 500)
+    : [];
+
+  // opened straight from disk? a file:// fetch is refused and logs a scary
+  // red error, so don't even try. The game needs no extra words to work.
+  if (location.protocol === "file:") return;
+
+  fetch("aliens.json", { cache: "no-store" })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      if (!data || typeof data !== "object") return;
+      let added = 0;
+
+      const names = clean(data.names, 14);
+      if (names.length){ PRE.length = 0; SUF.length = 0; PRE.push.apply(PRE, names); added += names.length; }
+
+      const bosses = clean(data.bossNames, 16);
+      if (bosses.length){ BOSS_NAMES.length = 0; BOSS_NAMES.push.apply(BOSS_NAMES, bosses); added += bosses.length; }
+
+      ["slime", "mech", "bug"].forEach(k => {
+        const t = clean(data.titles && data.titles[k], 20);
+        if (t.length){ SPECIES[k].names = t; added += t.length; }
+        const f = clean(data.flavour && data.flavour[k], 60);
+        if (f.length){ SPECIES[k].flavour = f; added += f.length; }
+      });
+
+      if (added) console.log("Alien Clash: loaded " + added + " extra words from aliens.json");
+    })
+    .catch(() => {});   // no file, or opened straight from disk. Both fine.
+})();
 </script>
