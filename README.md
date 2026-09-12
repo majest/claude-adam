@@ -12,6 +12,7 @@ Part of the family showcase at **https://majest.github.io/**
 | Project | What it is |
 | --- | --- |
 | [Understory](projects/understory/) | A forest that grows itself from a name you type. |
+| [Alien Clash](projects/alien-clash/) | A card game where every alien is invented as you flip it. |
 
 ## How it's laid out
 
@@ -21,8 +22,13 @@ projects/<name>/project.json   its title, emoji and description
 projects/<name>/README.md      optional, for the bigger ones
 ```
 
-`CLAUDE.md` is the instructions Claude follows when Adam asks for a new project.
-Adam can read it too.
+Three files tell Claude how to work here, and Adam can read all of them:
+
+| File | What it is |
+| --- | --- |
+| `CLAUDE.md` | how to talk to Adam. Claude gets this one automatically. |
+| `BUILDING.md` | the rules for building a project. Claude has to open it. |
+| `AI-TOOLBOX.md` | every AI capability, with code. Claude has to open it. |
 
 ## How it gets published
 

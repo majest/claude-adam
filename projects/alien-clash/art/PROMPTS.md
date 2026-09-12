@@ -4,6 +4,17 @@ The game does not need these. It draws every alien in code and works fine that
 way. This folder is for when the machine at home paints proper portraits, which
 the cards will then use instead.
 
+## Before you start
+
+Two things this depends on:
+
+- **Nothing in the browser can draw these.** The AI toolbox has ten
+  capabilities and none of them makes a picture. That is why these have to be
+  painted ahead of time and saved as files.
+- **Artur has to say yes to the size.** A full set of 48 comes to roughly 5 MB,
+  and a big file going into the repo is his decision, not Adam's. A partial set
+  is fine, so starting with one family is a way to see it working first.
+
 ## What to produce
 
 48 images, 16 per family, into this folder:

@@ -75,6 +75,11 @@ Every field is optional. Names are capped at 14 characters, boss names at 16,
 titles at 20 and flavour lines at 60, so a long one cannot break the card
 layout. Anything that is not a list of text is ignored.
 
+There is a word-making model that runs in the browser, and this project
+deliberately does not use it. It is 81 MB and it rambles, which is fine for a
+silly sentence and wrong for a card that has to read well every time. Names and
+flavour lines are better made once, in advance, and kept.
+
 This is the only place the project expects help from a model, and it happens
 **ahead of time, somewhere else**. The page itself never calls a server: it
 reads a plain file that is already there. Opened by double-clicking, the page
