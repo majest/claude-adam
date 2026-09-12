@@ -178,9 +178,12 @@ makes up words.
 
 That can be done. But it works differently.
 
-**The page must never ask a computer at home for help.** It has to keep working
-on a phone, at a friend's house, and at school. A page that phones home is
-broken for everyone except Adam.
+**The page must never ask the computer at home for help.** It has to keep
+working on a phone, at a friend's house, and at school. A page that phones home
+is broken for everyone except Adam.
+
+(The game helper further down is different — it lives on the internet, so any
+computer anywhere can reach it.)
 
 So the AI does its work *first*, somewhere else. Only what it made comes back
 into the project as an ordinary file:
@@ -212,16 +215,30 @@ the other reads it. It forgets everything after an hour, so nothing is kept.
 It works best for taking turns — noughts and crosses, battleships, a quiz
 buzzer, drawing together.
 
-Two rules:
+The helper lives here:
 
-- Adam can use the helper that is already there any time.
-- **`Artur:` has to say yes before making or changing anything out there**,
-  because that part costs money.
+```
+https://pr27r9l9jc.execute-api.eu-west-2.amazonaws.com
+```
 
-How it works is in the family notes on Artur's computer. Not in here.
+Send a move, then keep asking what's new:
 
-Anyone can read what goes on the shared notepad. So it is for game moves, not
-for anything private.
+```js
+// send
+fetch(ROOMS, { method: "POST", headers: { "content-type": "application/json" },
+  body: JSON.stringify({ room: "adam-v-alan", move: { square: 4 } }) });
+
+// read — "since" is the "now" you got back last time, or 0 to start
+fetch(ROOMS, { method: "POST", headers: { "content-type": "application/json" },
+  body: JSON.stringify({ room: "adam-v-alan", since: 0 }) });
+```
+
+Room names are small letters, numbers and hyphens. One move must be under 4 KB.
+
+**Stop asking when the game ends**, or it keeps going all night.
+
+Anyone who knows the room name can read what is in it. So it is for game moves,
+not for anything private. Never put a name in it.
 
 ---
 
