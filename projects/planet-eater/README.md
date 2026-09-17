@@ -35,7 +35,26 @@ down.
    the same size, and you cannot be chased off the edge of the world. You can
    be cornered against it, though.
 9. **The little round map** in the corner shows the whole arena: green is food,
-   red will eat you, gold is the galaxy, white is you.
+   grey is too big to swallow, red will actually eat you, gold is the galaxy,
+   white is you.
+
+## Playing in a room with friends
+
+Type the same room name as your friends and the game tells you how many of you
+are out there. That is all it does. Everybody plays their own space.
+
+It cannot do more than that, and it is worth knowing why. The rooms helper
+these projects share passes messages about once a second. That is fine for a
+count and hopeless for two planets chasing each other about: your friend would
+jump across the screen and eat you from somewhere you could not see them.
+Something that smooth needs a different kind of connection, which
+`BUILDING.md` describes as a separate and much larger build. Adam was offered a
+race instead and chose just the counter.
+
+Only a made-up id ever goes through the helper, never a name. Anything sent
+through it can be read by anyone who knows the room name, which is exactly why
+nothing else is sent. The polling stops the moment the page is hidden or the
+game ends.
 
 Move with a finger, a mouse, or the arrow keys.
 

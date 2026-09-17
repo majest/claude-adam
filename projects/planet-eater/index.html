@@ -119,6 +119,20 @@ h2{font-family:"Orbitron",Impact,sans-serif;font-weight:600;font-size:clamp(17px
 }
 #flash[data-on]{opacity:1}
 #hud[hidden]{display:none}   /* a display rule beats plain hidden, so say it */
+#roomname{
+  font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:16px;
+  padding:12px 14px;border-radius:12px;width:min(300px,86vw);text-align:center;
+  background:rgba(8,14,32,.7);border:2px solid var(--edge);color:var(--ink);
+}
+#roomname:focus{outline:3px solid var(--hot);outline-offset:2px}
+#crew{
+  font-size:12.5px;font-weight:700;letter-spacing:.04em;
+  padding:5px 13px;border-radius:999px;
+  background:rgba(8,14,32,.72);border:1px solid var(--edge);color:var(--cold);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+#crew[hidden]{display:none}
+
 #warn{
   position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .2s;
   box-shadow:inset 0 0 120px 30px rgba(255,60,80,.55);
@@ -165,6 +179,7 @@ details li{margin-bottom:5px}
     </div>
   </div>
   <div id="flash"></div>
+  <div id="crew" hidden></div>
 </div>
 
 <button id="mute" aria-pressed="false" aria-label="Turn sound off" title="Sound on or off">🔊</button>
@@ -175,6 +190,9 @@ details li{margin-bottom:5px}
   <p class="sub">Swallow everything smaller than you. Keep growing until you are big enough to eat the Milky Way.</p>
   <p class="tiny">Who are you?</p>
   <div class="picks" id="picks"></div>
+  <input id="roomname" maxlength="40" autocomplete="off" spellcheck="false"
+         placeholder="room name (optional)" aria-label="Room name, optional">
+  <p class="tiny" id="room-note">Type the same room as your friends to see how many of you are out here.</p>
   <button class="btn" id="play">Begin</button>
   <details>
     <summary>How to play</summary>
@@ -1002,6 +1020,7 @@ function finish(won){
   G.on = false; G.over = true;
   $("hud").hidden = true;
   $("warn").removeAttribute("data-on");
+  crewStop();
   const secs = Math.max(1, Math.round((performance.now() - G.started) / 1000));
   const stat = '<span class="chip">swallowed <b>' + G.eaten + '</b></span>' +
                '<span class="chip">time <b>' + secs + 's</b></span>' +
@@ -1397,7 +1416,10 @@ function drawMiniMap(){
     const big = b.r > P.r * 1.12;
     const food = b.r <= P.r * .86;
     if (!big && !food) continue;
-    ctx.fillStyle = big ? "rgba(255,80,96,.85)" : "rgba(92,224,138,.7)";
+    /* red only once they can actually hurt you. Before that they are simply
+       too big to swallow, which is a different thing to a child. */
+    ctx.fillStyle = big ? (G.hunted ? "rgba(255,80,96,.85)" : "rgba(150,170,205,.6)")
+                        : "rgba(92,224,138,.7)";
     ctx.beginPath();
     ctx.arc(x, y, clamp(b.r * k, big ? 1.8 : 1.2, 5), 0, TAU);
     ctx.fill();
@@ -1466,10 +1488,111 @@ let chosen = "earth";
   });
 })();
 
-document.getElementById("play").addEventListener("click", () => { SFX.tap(); start(chosen); });
+/* ════════════════════════════════════════════════════════════
+   WHO ELSE IS OUT HERE
+
+   Type the same room name as your friends and the game says how
+   many of you there are. That is all it says: everybody plays
+   their own space.
+
+   It cannot do more than that. The rooms helper passes messages
+   about once a second, which is fine for a count and hopeless
+   for two planets chasing each other about - your friend would
+   jump around the screen and eat you from somewhere you could
+   not see them. That needs a different kind of connection and
+   a much larger build.
+
+   Only a made-up id goes through it, never a name. Anything
+   sent through that helper can be read by anyone who knows the
+   room name.
+   ════════════════════════════════════════════════════════════ */
+const ROOMS = "https://pr27r9l9jc.execute-api.eu-west-2.amazonaws.com";
+const CREW = { room: "", me: "", since: 0, seen: new Map(), poll: 0, beat: 0, busy: false };
+const CREW_GONE = 14000;        // quiet this long and we count you as left
+
+function tidyRoom(raw){
+  return String(raw).trim().toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+}
+
+function crewSay(){
+  if (CREW.busy || !CREW.room) return;
+  fetch(ROOMS, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ room: CREW.room, move: { t: "here", id: CREW.me } })
+  }).catch(() => {});
+}
+
+function crewListen(){
+  if (CREW.busy || !CREW.room) return;
+  CREW.busy = true;
+  fetch(ROOMS, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ room: CREW.room, since: CREW.since })
+  }).then(r => r.json())
+    .then(data => {
+      CREW.busy = false;
+      if (!data || typeof data !== "object") return;
+      if (typeof data.now === "number") CREW.since = data.now;
+      for (const row of (Array.isArray(data.moves) ? data.moves : [])){
+        const mv = (row && row.move) ? row.move : row;
+        if (mv && mv.t === "here" && typeof mv.id === "string") CREW.seen.set(mv.id, Date.now());
+      }
+      crewPaint();
+    })
+    .catch(() => { CREW.busy = false; });
+}
+
+function crewPaint(){
+  const box = document.getElementById("crew");
+  if (!CREW.room){ box.hidden = true; return; }
+  const now = Date.now();
+  for (const [id, at] of CREW.seen) if (now - at > CREW_GONE) CREW.seen.delete(id);
+  const n = Math.max(1, CREW.seen.size);
+  box.hidden = false;
+  box.textContent = n === 1 ? "just you in " + CREW.room
+                            : n + " playing in " + CREW.room;
+}
+
+function crewJoin(room){
+  CREW.room = room;
+  CREW.me = "p" + Date.now().toString(36) + ((Math.random() * 1e6) | 0).toString(36);
+  CREW.since = 0;
+  CREW.seen.clear();
+  CREW.seen.set(CREW.me, Date.now());
+  crewSay();
+  crewListen();
+  crewPaint();
+  crewStop();
+  CREW.poll = setInterval(crewListen, 3000);
+  CREW.beat = setInterval(crewSay, 4000);
+}
+
+function crewStop(){
+  if (CREW.poll){ clearInterval(CREW.poll); CREW.poll = 0; }
+  if (CREW.beat){ clearInterval(CREW.beat); CREW.beat = 0; }
+}
+/* a forgotten loop runs all night */
+addEventListener("pagehide", crewStop);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) crewStop();
+  else if (CREW.room && G.on){ crewStop(); CREW.poll = setInterval(crewListen, 3000); CREW.beat = setInterval(crewSay, 4000); }
+});
+
+document.getElementById("play").addEventListener("click", () => {
+  SFX.tap();
+  const room = tidyRoom(document.getElementById("roomname").value);
+  crewStop();
+  if (room.length >= 3 && location.protocol !== "file:") crewJoin(room);
+  else { CREW.room = ""; crewPaint(); }
+  start(chosen);
+});
 document.getElementById("again").addEventListener("click", () => { SFX.tap(); showTitle(); });
 document.getElementById("again2").addEventListener("click", () => { SFX.tap(); showTitle(); });
 function showTitle(){
+  crewStop();
   document.querySelectorAll(".screen").forEach(s => s.removeAttribute("data-on"));
   document.getElementById("s-title").setAttribute("data-on", "");
   document.getElementById("hud").hidden = true;
