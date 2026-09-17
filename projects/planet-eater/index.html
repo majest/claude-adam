@@ -1,0 +1,1350 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Planet Eater</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Chakra+Petch:wght@500;600;700&display=swap">
+
+<style>
+:root{
+  --void:#03050E;
+  --deep:#070B1B;
+  --ink:#EAF0FF;
+  --ink-2:#9FB0D4;
+  --ink-3:#6B7CA6;
+  --edge:rgba(160,190,255,.18);
+  --hot:#FFB03A;
+  --cold:#5AC8FF;
+  --danger:#FF5566;
+  --good:#5CE08A;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--void);
+  color:var(--ink);
+  font-family:"Chakra Petch",ui-sans-serif,system-ui,sans-serif;
+  overflow:hidden;
+  -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
+}
+
+#sky{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+.screen{
+  position:fixed;inset:0;z-index:5;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;padding:20px;
+  padding-top:max(20px,env(safe-area-inset-top));
+  padding-bottom:max(20px,env(safe-area-inset-bottom));
+  overflow-y:auto;
+  background:radial-gradient(120% 90% at 50% 40%, rgba(10,16,40,.82) 0%, rgba(3,5,14,.96) 70%);
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+}
+.screen[data-on]{display:flex}
+
+h1{
+  font-family:"Orbitron",Impact,sans-serif;font-weight:800;
+  font-size:clamp(28px,8.5vw,58px);line-height:1;margin:0;text-align:center;
+  letter-spacing:.02em;
+  background:linear-gradient(180deg,#FFFFFF 0%,#9FD3FF 45%,#4B7BD8 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 26px rgba(90,160,255,.45));
+}
+h2{font-family:"Orbitron",Impact,sans-serif;font-weight:600;font-size:clamp(17px,4.6vw,26px);margin:0;text-align:center}
+.sub{margin:0;text-align:center;color:var(--ink-2);font-size:clamp(13.5px,3.5vw,16.5px);max-width:36ch;line-height:1.55}
+.tiny{margin:0;text-align:center;color:var(--ink-3);font-size:12.5px;letter-spacing:.02em}
+
+.btn{
+  font-family:"Orbitron",Impact,sans-serif;font-weight:600;font-size:clamp(14px,3.8vw,18px);
+  min-height:54px;padding:13px 26px;border:0;border-radius:13px;cursor:pointer;
+  color:#04121F;background:linear-gradient(180deg,#8FE3FF,#2E9BD6);
+  box-shadow:0 4px 0 #14567C, 0 10px 26px rgba(40,140,220,.34);
+  transition:transform .08s, box-shadow .08s, filter .15s;
+  letter-spacing:.03em;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #14567C}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:rgba(160,200,255,.09);color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.4);border:1px solid var(--edge)}
+.btn:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+
+/* ---------- who you are ---------- */
+.picks{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:560px}
+.pick{
+  flex:1 1 150px;max-width:172px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  padding:13px 10px 15px;border-radius:17px;cursor:pointer;font:inherit;color:var(--ink);
+  background:rgba(140,180,255,.06);
+  border:2px solid var(--edge);
+  transition:all .16s;
+}
+.pick canvas{width:86px;height:86px;display:block}
+.pick b{font-family:"Orbitron",sans-serif;font-weight:600;font-size:14px;letter-spacing:.02em}
+.pick small{font-size:11.5px;color:var(--ink-2);text-align:center;line-height:1.35;min-height:2.7em}
+.pick[aria-pressed="true"]{
+  background:rgba(90,200,255,.16);border-color:#5AC8FF;
+  box-shadow:0 0 0 4px rgba(90,200,255,.16), 0 0 30px rgba(90,200,255,.22);
+}
+.pick:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+
+/* ---------- the readout while playing ---------- */
+#hud{
+  position:fixed;left:0;right:0;top:0;z-index:3;pointer-events:none;
+  padding:10px 12px;
+  padding-top:max(10px,env(safe-area-inset-top));
+  display:flex;flex-direction:column;gap:7px;align-items:center;
+}
+.bar{
+  width:min(560px,94vw);height:34px;border-radius:999px;position:relative;overflow:hidden;
+  background:rgba(8,14,32,.72);border:1px solid var(--edge);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.fill{position:absolute;inset:0;width:0%;background:linear-gradient(90deg,#2E9BD6,#8FE3FF);opacity:.34;transition:width .25s}
+.barText{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;font-size:12.5px;font-weight:700;letter-spacing:.04em;
+}
+.barText b{font-family:"Orbitron",sans-serif;font-weight:600;font-size:13px}
+#tierName{color:var(--cold)}
+#nextName{color:var(--ink-3)}
+#flash{
+  font-family:"Orbitron",sans-serif;font-weight:600;
+  font-size:clamp(13px,3.6vw,17px);text-align:center;
+  min-height:1.4em;opacity:0;transition:opacity .3s;
+  text-shadow:0 0 14px rgba(0,0,0,.9);
+}
+#flash[data-on]{opacity:1}
+#hud[hidden]{display:none}   /* a display rule beats plain hidden, so say it */
+#warn{
+  position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .2s;
+  box-shadow:inset 0 0 120px 30px rgba(255,60,80,.55);
+}
+#warn[data-on]{opacity:1}
+
+#mute{
+  position:fixed;top:max(9px,env(safe-area-inset-top));right:9px;z-index:6;
+  width:40px;height:40px;border-radius:11px;cursor:pointer;font-size:17px;line-height:1;
+  background:rgba(8,14,32,.62);border:1px solid var(--edge);color:var(--ink);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+#mute:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+
+details{width:100%;max-width:430px;background:rgba(8,14,32,.55);border:1px solid var(--edge);border-radius:13px}
+summary{cursor:pointer;padding:12px 15px;font-weight:700;font-size:14px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-3)}
+details[open] summary::before{content:"▾ "}
+details ol{margin:0;padding:0 18px 14px 32px;color:var(--ink-2);font-size:13.5px;line-height:1.6}
+details li{margin-bottom:5px}
+
+.stat{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.chip{
+  font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:999px;
+  background:rgba(140,180,255,.08);border:1px solid var(--edge);color:var(--ink-2);
+}
+.chip b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+@media (prefers-reduced-motion:reduce){ *{transition-duration:.01ms !important} }
+</style>
+
+<canvas id="sky"></canvas>
+
+<div id="warn"></div>
+
+<div id="hud" hidden>
+  <div class="bar">
+    <div class="fill" id="fill"></div>
+    <div class="barText">
+      <b id="tierName">eating rocks</b>
+      <span id="sizeText"></span>
+      <b id="nextName">next: moons</b>
+    </div>
+  </div>
+  <div id="flash"></div>
+</div>
+
+<button id="mute" aria-pressed="false" aria-label="Turn sound off" title="Sound on or off">🔊</button>
+
+<!-- ░░ TITLE ░░ -->
+<section class="screen" id="s-title" data-on>
+  <h1>Planet<br>Eater</h1>
+  <p class="sub">Swallow everything smaller than you. Keep growing until you are big enough to eat the Milky Way.</p>
+  <p class="tiny">Who are you?</p>
+  <div class="picks" id="picks"></div>
+  <button class="btn" id="play">Begin</button>
+  <details>
+    <summary>How to play</summary>
+    <ol>
+      <li>Move with your finger, your mouse, or the arrow keys. You always drift towards it.</li>
+      <li>Touch anything <b>smaller</b> than you and you swallow it and grow.</li>
+      <li>Anything <b>bigger</b> is too big to eat. Leave it alone.</li>
+      <li>While you are small, nothing can hurt you.</li>
+      <li>Once you are big enough to eat planets, the giants start hunting you. The screen goes red when one is close.</li>
+      <li>If a giant catches you it tears a chunk off. Get too small and you are gone.</li>
+      <li>Reach the very top and the Milky Way itself turns up.</li>
+    </ol>
+  </details>
+</section>
+
+<!-- ░░ EATEN ░░ -->
+<section class="screen" id="s-lost">
+  <h1>Swallowed</h1>
+  <p class="sub" id="lost-note"></p>
+  <div class="stat" id="lost-stat"></div>
+  <button class="btn" id="again">Try again</button>
+</section>
+
+<!-- ░░ WON ░░ -->
+<section class="screen" id="s-won">
+  <h1>The Milky Way<br>is gone</h1>
+  <p class="sub" id="won-note"></p>
+  <div class="stat" id="won-stat"></div>
+  <button class="btn" id="again2">Play again</button>
+</section>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════
+   PLANET EATER
+
+   Everything you see is drawn in code. There is not one picture
+   file here, because a project in this repo cannot fetch
+   anything from the internet.
+
+   What makes it look real is mostly one thing: every world is
+   lit from the same direction, so it has a day side, a night
+   side, and a bright sliver along the edge where the light just
+   catches it. Add craters with shadows that fall the right way,
+   bands that bend round the curve, and a haze of atmosphere,
+   and a flat circle starts to look like a ball.
+   ════════════════════════════════════════════════════════════ */
+
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/* the light comes from up and to the left, for everything, always */
+const LX = -0.58, LY = -0.60;
+const LIT_ANGLE = Math.atan2(LY, LX);
+
+/* ---------- dice that remember ---------- */
+function mulberry32(a){
+  return function(){
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+class Rng {
+  constructor(seed){ this.n = mulberry32(seed | 0); }
+  f(a, b){ const v = this.n(); return a === undefined ? v : b === undefined ? v * a : a + v * (b - a); }
+  int(a, b){ return Math.floor(this.f(a, b + 1)); }
+  pick(arr){ return arr[Math.floor(this.n() * arr.length)]; }
+  chance(p){ return this.n() < p; }
+}
+const hsl = (h, s, l, a) => "hsl(" + ((h % 360) + 360) % 360 + " " + s + "% " + l + "%" + (a === undefined ? "" : " / " + a) + ")";
+
+/* ════════════════════════════════════════════════════════════
+   NOISES, built in code
+   ════════════════════════════════════════════════════════════ */
+let AC = null, muted = false;
+try { muted = localStorage.getItem("planet-eater-muted") === "1"; } catch (e) {}
+
+function audio(){
+  if (!AC){
+    const C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return null;
+    AC = new C();
+  }
+  if (AC.state === "suspended") AC.resume();
+  return AC;
+}
+function tone(o){
+  if (muted) return;
+  const c = audio(); if (!c) return;
+  const t0 = c.currentTime + (o.delay || 0);
+  const dur = o.dur || .16;
+  const osc = c.createOscillator(), g = c.createGain();
+  osc.type = o.type || "sine";
+  osc.frequency.setValueAtTime(o.freq, t0);
+  if (o.to) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.to), t0 + dur);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(o.gain === undefined ? .13 : o.gain, t0 + .012);
+  g.gain.exponentialRampToValueAtTime(.0005, t0 + dur);
+  osc.connect(g).connect(c.destination);
+  osc.start(t0); osc.stop(t0 + dur + .04);
+}
+function noise(dur, gain, freq, q, delay){
+  if (muted) return;
+  const c = audio(); if (!c) return;
+  const n = Math.max(1, Math.floor(c.sampleRate * dur));
+  const buf = c.createBuffer(1, n, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const src = c.createBufferSource(); src.buffer = buf;
+  const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = freq; bp.Q.value = q || 1;
+  const g = c.createGain(); g.gain.value = gain;
+  src.connect(bp).connect(g).connect(c.destination);
+  src.start(c.currentTime + (delay || 0));
+}
+const SFX = {
+  /* a swallow drops in pitch the bigger the meal, so growth is audible */
+  eat(big){
+    const f = lerp(760, 150, clamp(big, 0, 1));
+    tone({ freq: f, to: f * .45, dur: .17 + big * .2, type: "sine", gain: .14 });
+    noise(.1 + big * .18, .05 + big * .05, 500 + (1 - big) * 1400, 1.1, .01);
+  },
+  grow(){ [523, 659, 784, 1047].forEach((f, i) => tone({ freq: f, dur: .14, type: "triangle", gain: .1, delay: i * .07 })); },
+  bite(){
+    noise(.2, .2, 260, .7);
+    tone({ freq: 150, to: 44, dur: .5, type: "sawtooth", gain: .24 });
+    tone({ freq: 84, to: 38, dur: .6, type: "sine", gain: .18, delay: .04 });
+  },
+  near(){ tone({ freq: 120, to: 96, dur: .28, type: "sawtooth", gain: .05 }); },
+  gone(){ [392, 311, 233, 165].forEach((f, i) => tone({ freq: f, dur: .3, type: "triangle", gain: .13, delay: i * .15 })); },
+  win(){ [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone({ freq: f, dur: .35, type: "triangle", gain: .12, delay: i * .13 })); },
+  tap(){ tone({ freq: 620, dur: .05, type: "triangle", gain: .07 }); }
+};
+
+/* ════════════════════════════════════════════════════════════
+   MAKING A WORLD LOOK ROUND
+   ════════════════════════════════════════════════════════════ */
+
+/* darkens the half facing away from the light and lifts the half facing it */
+function shadeSphere(ctx, cx, cy, R, strength){
+  const s = strength === undefined ? 1 : strength;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  const g = ctx.createRadialGradient(
+    cx + LX * R * .62, cy + LY * R * .62, R * .06,
+    cx - LX * R * .20, cy - LY * R * .20, R * 1.42);
+  g.addColorStop(0,   "rgba(255,255,248," + (.13 * s) + ")");
+  g.addColorStop(.34, "rgba(0,0,0,0)");
+  g.addColorStop(.72, "rgba(0,0,10," + (.55 * s) + ")");
+  g.addColorStop(1,   "rgba(0,0,8," + (.93 * s) + ")");
+  ctx.fillStyle = g;
+  ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+  ctx.restore();
+}
+
+/* the bright sliver where the light just catches the edge */
+function limbLight(ctx, cx, cy, R, colour, width){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - width * .35, LIT_ANGLE - 1.25, LIT_ANGLE + 1.25);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* a haze of air standing off the edge */
+function atmosphere(ctx, cx, cy, R, colour, thick){
+  const g = ctx.createRadialGradient(cx, cy, R * .93, cx, cy, R * (1 + thick));
+  g.addColorStop(0, colour);
+  g.addColorStop(.55, colour.replace(/[\d.]+\)$/, ".18)"));
+  g.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(cx, cy, R * (1 + thick), 0, TAU); ctx.fill();
+}
+
+/* blotchy ground: many soft patches of slightly different colour */
+function mottle(ctx, cx, cy, R, r, hue, sat, light, n, spread){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  for (let i = 0; i < n; i++){
+    const a = r.f(TAU), d = r.f(0, R * .98);
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
+    const rr = r.f(R * .08, R * .42);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+    g.addColorStop(0, hsl(hue + r.f(-spread, spread), sat, light + r.f(-9, 9), r.f(.10, .30)));
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* a crater is a dark dish with a lit wall on one side and a shadow opposite */
+function crater(ctx, x, y, rr, shade){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.clip();
+  ctx.fillStyle = "rgba(0,0,0," + (.20 * shade) + ")";
+  ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+  // wall catching the light, on the side the light comes from
+  ctx.fillStyle = "rgba(255,252,240," + (.26 * shade) + ")";
+  ctx.beginPath(); ctx.arc(x + LX * rr * .30, y + LY * rr * .30, rr * .82, 0, TAU); ctx.fill();
+  // the floor, and the shadow thrown across it
+  ctx.fillStyle = "rgba(0,0,4," + (.34 * shade) + ")";
+  ctx.beginPath(); ctx.arc(x - LX * rr * .16, y - LY * rr * .16, rr * .72, 0, TAU); ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = "rgba(255,255,245," + (.12 * shade) + ")";
+  ctx.lineWidth = Math.max(.6, rr * .09);
+  ctx.beginPath(); ctx.arc(x, y, rr, LIT_ANGLE - 1.5, LIT_ANGLE + 1.5); ctx.stroke();
+}
+/* ════════════════════════════════════════════════════════════
+   THE WORLDS THEMSELVES
+   Each one is painted once onto its own small canvas and then
+   stamped on the screen every frame. Painting gradients sixty
+   times a second for fifty worlds would melt a phone.
+   ════════════════════════════════════════════════════════════ */
+
+function paintRock(ctx, S, seed){
+  const r = new Rng(seed), cx = S / 2, cy = S / 2, R = S * .46;
+  const hue = r.f(18, 40), pts = [];
+  const n = r.int(9, 13);
+  for (let i = 0; i < n; i++){
+    const a = i / n * TAU;
+    pts.push([cx + Math.cos(a) * R * r.f(.68, 1), cy + Math.sin(a) * R * r.f(.68, 1)]);
+  }
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < n; i++){
+    const p = pts[i], q = pts[(i + 1) % n];
+    ctx.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2);
+  }
+  ctx.closePath();
+  ctx.save(); ctx.clip();
+  ctx.fillStyle = hsl(hue, 14, 34); ctx.fillRect(0, 0, S, S);
+  mottle(ctx, cx, cy, R, r, hue, 16, 36, 16, 10);
+  for (let i = 0; i < r.int(4, 9); i++){
+    const a = r.f(TAU), d = r.f(0, R * .7);
+    crater(ctx, cx + Math.cos(a) * d, cy + Math.sin(a) * d, r.f(R * .09, R * .26), .9);
+  }
+  shadeSphere(ctx, cx, cy, R * 1.06, 1.05);
+  ctx.restore();
+  ctx.save(); ctx.clip();
+  limbLight(ctx, cx, cy, R * 1.02, "rgba(255,240,215,.34)", R * .12);
+  ctx.restore();
+}
+
+function paintMoon(ctx, S, seed){
+  const r = new Rng(seed), cx = S / 2, cy = S / 2, R = S * .455;
+  const hue = r.pick([32, 38, 44, 210, 26]);
+  const light = r.f(48, 64);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  ctx.fillStyle = hsl(hue, r.f(6, 16), light); ctx.fillRect(0, 0, S, S);
+  mottle(ctx, cx, cy, R, r, hue, 12, light - 10, 22, 14);
+  // the dark seas
+  for (let i = 0; i < r.int(2, 5); i++){
+    const a = r.f(TAU), d = r.f(0, R * .55);
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, rr = r.f(R * .2, R * .46);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+    g.addColorStop(0, hsl(hue, 10, light - 22, .55));
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+  }
+  for (let i = 0; i < r.int(9, 18); i++){
+    const a = r.f(TAU), d = r.f(0, R * .93);
+    crater(ctx, cx + Math.cos(a) * d, cy + Math.sin(a) * d, r.f(R * .04, R * .17), 1);
+  }
+  ctx.restore();
+  shadeSphere(ctx, cx, cy, R);
+  limbLight(ctx, cx, cy, R, "rgba(255,246,226,.32)", R * .08);
+}
+
+function paintRocky(ctx, S, seed){
+  const r = new Rng(seed), cx = S / 2, cy = S / 2, R = S * .43;
+  const ocean = r.chance(.55);
+  const seaHue = r.f(196, 228), landHue = r.f(72, 118), dustHue = r.f(14, 34);
+  const hue = ocean ? seaHue : dustHue;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  ctx.fillStyle = ocean ? hsl(seaHue, 58, 30) : hsl(dustHue, 42, 38);
+  ctx.fillRect(0, 0, S, S);
+  if (ocean){
+    // continents
+    for (let i = 0; i < r.int(4, 8); i++){
+      const a = r.f(TAU), d = r.f(0, R * .72);
+      const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, rr = r.f(R * .16, R * .40);
+      ctx.fillStyle = hsl(landHue + r.f(-14, 14), r.f(30, 48), r.f(26, 40), .95);
+      ctx.beginPath();
+      for (let k = 0; k <= 10; k++){
+        const aa = k / 10 * TAU, dd = rr * r.f(.55, 1.15);
+        const px = x + Math.cos(aa) * dd, py = y + Math.sin(aa) * dd;
+        k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.closePath(); ctx.fill();
+    }
+    // ice at the poles
+    for (const sy of [-1, 1]){
+      const g = ctx.createRadialGradient(cx, cy + sy * R, 0, cx, cy + sy * R, R * .52);
+      g.addColorStop(0, "rgba(246,252,255,.92)");
+      g.addColorStop(1, "rgba(246,252,255,0)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+    }
+    // weather
+    for (let i = 0; i < r.int(8, 16); i++){
+      const a = r.f(TAU), d = r.f(0, R * .9);
+      const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, rr = r.f(R * .08, R * .3);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+      g.addColorStop(0, "rgba(255,255,255," + r.f(.22, .5) + ")");
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+    }
+  } else {
+    mottle(ctx, cx, cy, R, r, dustHue, 40, 40, 26, 12);
+    for (let i = 0; i < r.int(5, 12); i++){
+      const a = r.f(TAU), d = r.f(0, R * .9);
+      crater(ctx, cx + Math.cos(a) * d, cy + Math.sin(a) * d, r.f(R * .05, R * .16), .8);
+    }
+    const g = ctx.createRadialGradient(cx, cy - R, 0, cx, cy - R, R * .45);
+    g.addColorStop(0, "rgba(255,255,255,.7)"); g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+  }
+  ctx.restore();
+  shadeSphere(ctx, cx, cy, R);
+  limbLight(ctx, cx, cy, R, ocean ? "rgba(190,230,255,.5)" : "rgba(255,226,190,.4)", R * .07);
+  atmosphere(ctx, cx, cy, R, ocean ? "rgba(120,190,255,.34)" : "rgba(220,150,90,.22)", .14);
+}
+
+function paintGiant(ctx, S, seed){
+  const r = new Rng(seed), cx = S / 2, cy = S / 2, R = S * .40;
+  const hue = r.pick([30, 36, 44, 20, 190, 205, 220]);
+  const rings = r.chance(.45);
+  const tilt = r.f(-.42, .42);
+
+  if (rings){                       // the half of the ring behind the planet
+    drawRings(ctx, cx, cy, R, tilt, r, hue, true);
+  }
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  ctx.fillStyle = hsl(hue, 42, 46); ctx.fillRect(0, 0, S, S);
+  // bands, squashed towards the poles so they follow the curve
+  let y = -R;
+  while (y < R){
+    const h = R * r.f(.06, .20);
+    const t = clamp((y + R) / (2 * R), 0, 1);
+    const wobble = Math.sin(t * 7 + r.f(0, 3)) * R * .035;
+    ctx.fillStyle = hsl(hue + r.f(-14, 14), r.f(26, 58), r.f(32, 68), r.f(.30, .62));
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + y + h / 2 + wobble, R * 1.02, h * .62, 0, 0, TAU);
+    ctx.fill();
+    y += h * r.f(.75, 1.15);
+  }
+  // swirls where the bands rub together
+  for (let i = 0; i < r.int(14, 26); i++){
+    const yy = cy + r.f(-R * .92, R * .92);
+    const xx = cx + r.f(-R, R);
+    const w = r.f(R * .1, R * .42), h = r.f(R * .02, R * .07);
+    ctx.strokeStyle = hsl(hue + r.f(-20, 20), 40, r.f(30, 80), r.f(.12, .34));
+    ctx.lineWidth = Math.max(.7, h);
+    ctx.beginPath(); ctx.ellipse(xx, yy, w, h, r.f(-.2, .2), 0, TAU); ctx.stroke();
+  }
+  // a big storm, the way Jupiter has one
+  if (r.chance(.75)){
+    const sx = cx + r.f(-R * .45, R * .45), sy = cy + r.f(-R * .5, R * .5);
+    const sw = R * r.f(.16, .30), sh = sw * r.f(.42, .66);
+    const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, sw);
+    g.addColorStop(0, hsl(r.f(6, 22), 68, 54, .92));
+    g.addColorStop(.7, hsl(r.f(6, 22), 60, 40, .55));
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.ellipse(sx, sy, sw, sh, 0, 0, TAU); ctx.fill();
+  }
+  ctx.restore();
+  shadeSphere(ctx, cx, cy, R);
+  limbLight(ctx, cx, cy, R, "rgba(255,240,210,.40)", R * .07);
+  atmosphere(ctx, cx, cy, R, "rgba(255,210,150,.20)", .10);
+  if (rings) drawRings(ctx, cx, cy, R, tilt, new Rng(seed), hue, false);
+}
+
+function drawRings(ctx, cx, cy, R, tilt, r, hue, behind){
+  ctx.save();
+  if (behind){
+    ctx.beginPath();
+    ctx.rect(cx - R * 3, cy - R * 3, R * 6, R * 6);
+    ctx.arc(cx, cy, R, 0, TAU, true);   // never over the planet itself
+    ctx.clip("evenodd");
+  } else {
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, R * 2.3, R * 2.3 * .30, tilt, 0, TAU);
+    ctx.clip();
+    ctx.beginPath();
+    ctx.rect(cx - R * 3, cy, R * 6, R * 3);   // only the half in front
+    ctx.clip();
+  }
+  const bands = 16;
+  for (let i = 0; i < bands; i++){
+    const t = i / bands;
+    const rad = R * lerp(1.32, 2.28, t);
+    ctx.strokeStyle = hsl(hue + r.f(-10, 10), r.f(10, 30), r.f(52, 80), r.f(.06, .30));
+    ctx.lineWidth = R * r.f(.02, .07);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rad, rad * .30, tilt, 0, TAU);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function paintStar(ctx, S, seed){
+  const r = new Rng(seed), cx = S / 2, cy = S / 2, R = S * .30;
+  const hue = r.pick([12, 20, 30, 42, 50, 200, 210]);
+  const hot = hue > 100;
+  // the glow around it
+  const glow = ctx.createRadialGradient(cx, cy, R * .5, cx, cy, S * .5);
+  glow.addColorStop(0, hsl(hue, 100, hot ? 78 : 62, .55));
+  glow.addColorStop(.35, hsl(hue, 100, hot ? 62 : 50, .22));
+  glow.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, S, S);
+  // flares
+  for (let i = 0; i < 9; i++){
+    const a = r.f(TAU), len = R * r.f(1.25, 2.1);
+    const g = ctx.createLinearGradient(cx, cy, cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+    g.addColorStop(0, hsl(hue, 100, 72, .34));
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.strokeStyle = g; ctx.lineWidth = R * r.f(.08, .22); ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len); ctx.stroke();
+  }
+  // the surface
+  const face = ctx.createRadialGradient(cx - R * .2, cy - R * .2, R * .1, cx, cy, R);
+  face.addColorStop(0, "rgba(255,255,248,1)");
+  face.addColorStop(.45, hsl(hue, 100, 74));
+  face.addColorStop(1, hsl(hue, 96, hot ? 58 : 48));
+  ctx.fillStyle = face;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.fill();
+  // boiling grains on the surface
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  for (let i = 0; i < 90; i++){
+    const a = r.f(TAU), d = r.f(0, R);
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, rr = r.f(R * .03, R * .11);
+    ctx.fillStyle = hsl(hue + r.f(-8, 8), 100, r.f(58, 92), r.f(.10, .30));
+    ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+  }
+  // darker patches, like sunspots
+  for (let i = 0; i < r.int(2, 6); i++){
+    const a = r.f(TAU), d = r.f(0, R * .7);
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, rr = r.f(R * .05, R * .14);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+    g.addColorStop(0, "rgba(90,30,0,.55)"); g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function paintHole(ctx, S, seed){
+  const r = new Rng(seed), cx = S / 2, cy = S / 2, R = S * .16;
+  const tilt = r.f(-.3, .3);
+  const discR = R * 2.4;          // must stay inside the canvas or it gets cut square
+  // the far side of the disc, bent up over the top by the gravity
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, 0, S, cy); ctx.clip();
+  for (let i = 0; i < 28; i++){
+    const t = i / 28, rad = lerp(R * 1.25, discR, t);
+    ctx.strokeStyle = hsl(lerp(46, 18, t), 100, lerp(84, 44, t), (1 - t) * .5);
+    ctx.lineWidth = R * .17;
+    ctx.beginPath(); ctx.ellipse(cx, cy, rad, rad * .20, tilt, Math.PI, TAU); ctx.stroke();
+  }
+  ctx.restore();
+  // the near side
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, cy, S, S - cy); ctx.clip();
+  for (let i = 0; i < 28; i++){
+    const t = i / 28, rad = lerp(R * 1.25, discR, t);
+    // one side races towards us and burns brighter
+    const g = ctx.createLinearGradient(cx - rad, cy, cx + rad, cy);
+    g.addColorStop(0, hsl(lerp(50, 20, t), 100, lerp(92, 52, t), (1 - t) * .8));
+    g.addColorStop(1, hsl(lerp(30, 10, t), 100, lerp(60, 30, t), (1 - t) * .34));
+    ctx.strokeStyle = g;
+    ctx.lineWidth = R * .17;
+    ctx.beginPath(); ctx.ellipse(cx, cy, rad, rad * .20, tilt, 0, Math.PI); ctx.stroke();
+  }
+  ctx.restore();
+  // the ring of light right at the edge, then nothing at all
+  const halo = ctx.createRadialGradient(cx, cy, R * .82, cx, cy, R * 1.5);
+  halo.addColorStop(0, "rgba(255,214,140,0)");
+  halo.addColorStop(.42, "rgba(255,226,170,.95)");
+  halo.addColorStop(.62, "rgba(255,160,60,.35)");
+  halo.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = halo;
+  ctx.beginPath(); ctx.arc(cx, cy, R * 1.5, 0, TAU); ctx.fill();
+  ctx.fillStyle = "#000005";
+  ctx.beginPath(); ctx.arc(cx, cy, R * .97, 0, TAU); ctx.fill();
+}
+/* ════════════════════════════════════════════════════════════
+   WHAT IS OUT THERE
+   Sizes are not to scale, and could not be: a real galaxy is
+   about a million million million times a moon. The ladder is
+   squashed so it stays playable. The names and the widths in
+   kilometres, though, are the real ones.
+   ════════════════════════════════════════════════════════════ */
+
+function paintEarth(ctx, S){
+  const r = new Rng(20260917), cx = S / 2, cy = S / 2, R = S * .43;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  const sea = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+  sea.addColorStop(0, "#1B4C8C"); sea.addColorStop(.5, "#1263A8"); sea.addColorStop(1, "#0C3B6B");
+  ctx.fillStyle = sea; ctx.fillRect(0, 0, S, S);
+  for (let i = 0; i < 7; i++){
+    const a = r.f(TAU), d = r.f(0, R * .72);
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, rr = r.f(R * .18, R * .42);
+    ctx.fillStyle = r.chance(.3) ? "rgba(196,168,104,.92)" : "rgba(72,124,58,.94)";
+    ctx.beginPath();
+    for (let k = 0; k <= 12; k++){
+      const aa = k / 12 * TAU, dd = rr * r.f(.5, 1.2);
+      const px = x + Math.cos(aa) * dd, py = y + Math.sin(aa) * dd;
+      k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+  for (const sy of [-1, 1]){
+    const g = ctx.createRadialGradient(cx, cy + sy * R, 0, cx, cy + sy * R, R * .5);
+    g.addColorStop(0, "rgba(250,253,255,.95)"); g.addColorStop(1, "rgba(250,253,255,0)");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+  }
+  for (let i = 0; i < 20; i++){
+    const a = r.f(TAU), d = r.f(0, R * .95);
+    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, rr = r.f(R * .08, R * .28);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, rr);
+    g.addColorStop(0, "rgba(255,255,255," + r.f(.3, .62) + ")");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+  }
+  ctx.restore();
+  shadeSphere(ctx, cx, cy, R);
+  limbLight(ctx, cx, cy, R, "rgba(180,225,255,.62)", R * .07);
+  atmosphere(ctx, cx, cy, R, "rgba(110,185,255,.42)", .15);
+}
+
+/* The bands widen as they go up. With narrow ones at the top, everything
+   large came out a black hole and the late game was a wall of them. */
+const KINDS = {
+  rock:  { paint: paintRock,  fill: .92, min: 3,   max: 9 },
+  moon:  { paint: paintMoon,  fill: .91, min: 9,   max: 26 },
+  rocky: { paint: paintRocky, fill: .86, min: 26,  max: 58 },
+  giant: { paint: paintGiant, fill: .80, min: 58,  max: 150 },
+  star:  { paint: paintStar,  fill: .60, min: 150, max: 430 },
+  hole:  { paint: paintHole,  fill: .32, min: 430, max: 1000 }
+};
+const KIND_ORDER = ["rock", "moon", "rocky", "giant", "star", "hole"];
+function kindFor(r){
+  for (const k of KIND_ORDER) if (r < KINDS[k].max) return k;
+  return "hole";
+}
+
+/* real things, with their real widths */
+const NAMES = {
+  rock: [["Ceres",940],["Vesta",525],["Pallas",512],["Hygiea",434],["Psyche",226],["Juno",247],
+         ["Iris",200],["Davida",289],["Eros",17],["Bennu",0.49],["Ryugu",0.9],["Itokawa",0.33]],
+  moon: [["Luna",3475],["Europa",3122],["Io",3643],["Ganymede",5268],["Callisto",4821],["Titan",5150],
+         ["Enceladus",504],["Triton",2707],["Rhea",1528],["Dione",1123],["Mimas",396],["Charon",1212],
+         ["Miranda",471],["Ariel",1158],["Phobos",22],["Deimos",12]],
+  rocky:[["Mercury",4879],["Venus",12104],["Earth",12742],["Mars",6779],["Kepler-186f",14000],
+         ["Proxima b",14200],["TRAPPIST-1e",11700],["Gliese 581g",19000],["Kepler-452b",20000]],
+  giant:[["Jupiter",139820],["Saturn",116460],["Uranus",50724],["Neptune",49244],
+         ["HD 189733b",157000],["WASP-12b",250000],["51 Pegasi b",270000],["Kepler-7b",220000]],
+  star: [["Sol",1391400],["Proxima Centauri",215000],["Sirius",2380000],["Vega",3860000],
+         ["Altair",2400000],["Aldebaran",61000000],["Arcturus",35000000],["Polaris",65000000],
+         ["Rigel",109000000],["Betelgeuse",1200000000],["Antares",946000000],["Deneb",290000000]],
+  hole: [["Sagittarius A*",23600000],["M87*",38000000000],["Cygnus X-1",124],
+         ["V404 Cygni",53],["GRO J1655-40",37]]
+};
+function kmText(n){
+  if (n >= 1e9) return (n / 1e9).toFixed(n >= 1e10 ? 0 : 1) + " billion km across";
+  if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + " million km across";
+  if (n < 1) return (n * 1000).toFixed(0) + " m across";
+  return Math.round(n).toLocaleString("en-GB") + " km across";
+}
+
+/* The ladder says what is on the menu, not what you are. Calling the Earth
+   a moon because it happens to be small was just confusing. Each step is the
+   size where the biggest of that sort becomes swallowable. */
+const TIERS = [
+  { at: 0,   name: "rocks" },
+  { at: 30,  name: "moons" },
+  { at: 66,  name: "planets" },
+  { at: 170, name: "gas giants" },
+  { at: 489, name: "stars" },
+  { at: 620, name: "the galaxy" }
+];
+const GALAXY_AT = 620;
+const DANGER_AT = 66;          // nothing hunts you until you can swallow planets
+
+const WHO = {
+  moon:  { label: "Moon",       start: 11, speed: 1.28, paint: (c,S) => paintMoon(c, S, 77),
+           fill: .91, blurb: "Small and quick. Hard to catch.",
+           hello: "You are a moon. Eat anything smaller than you." },
+  earth: { label: "Earth",      start: 14, speed: 1.00, paint: paintEarth,
+           fill: .86, blurb: "Steady, and starts a bit bigger.",
+           hello: "You are the Earth. Eat anything smaller than you." },
+  hole:  { label: "Black hole", start: 12, speed: .82,  paint: (c,S) => paintHole(c, S, 5),
+           fill: .32, blurb: "Slow, but drags food towards you.",
+           hello: "You are a black hole. Food comes to you." }
+};
+
+/* ════════════════════════════════════════════════════════════
+   TEXTURES, PAINTED ONCE
+   ════════════════════════════════════════════════════════════ */
+const texCache = new Map();
+function texture(kind, seed, size){
+  const key = kind + "|" + seed + "|" + size;
+  let cv = texCache.get(key);
+  if (cv) return cv;
+  cv = document.createElement("canvas");
+  cv.width = cv.height = size;
+  KINDS[kind].paint(cv.getContext("2d"), size, seed);
+  if (texCache.size > 180) texCache.clear();
+  texCache.set(key, cv);
+  return cv;
+}
+
+let galaxyTex = null;
+function galaxyTexture(){
+  if (galaxyTex) return galaxyTex;
+  const S = 1100, cv = document.createElement("canvas");
+  cv.width = cv.height = S;
+  const ctx = cv.getContext("2d"), r = new Rng(31415), cx = S / 2, cy = S / 2;
+  const R = S * .47;
+  // the glow of a hundred billion suns
+  const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+  halo.addColorStop(0, "rgba(255,244,214,.95)");
+  halo.addColorStop(.09, "rgba(255,226,170,.55)");
+  halo.addColorStop(.32, "rgba(150,170,255,.20)");
+  halo.addColorStop(1, "rgba(30,40,90,0)");
+  ctx.fillStyle = halo; ctx.fillRect(0, 0, S, S);
+  // four arms of stars, wound round
+  const ARMS = 4;
+  for (let a = 0; a < ARMS; a++){
+    const off = a / ARMS * TAU;
+    for (let i = 0; i < 5200; i++){
+      const t = Math.pow(r.f(), .55);
+      const ang = off + t * 4.6 + r.f(-.20, .20);
+      const rad = t * R * .94 + r.f(-R * .028, R * .028);
+      const x = cx + Math.cos(ang) * rad;
+      const y = cy + Math.sin(ang) * rad * .42;      // seen at an angle
+      const near = 1 - t;
+      const hue = r.chance(.25) ? r.f(200, 230) : r.f(28, 52);
+      ctx.fillStyle = hsl(hue, r.f(40, 90), r.f(62, 94), r.f(.10, .55) * (.35 + near));
+      const rr = r.f(.6, 2.3);
+      ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
+    }
+  }
+  // lanes of dust cutting through the arms
+  for (let a = 0; a < ARMS; a++){
+    const off = a / ARMS * TAU + .38;
+    ctx.strokeStyle = "rgba(10,6,20,.42)";
+    for (let w = 0; w < 3; w++){
+      ctx.lineWidth = r.f(5, 16);
+      ctx.beginPath();
+      for (let i = 0; i <= 60; i++){
+        const t = i / 60, ang = off + t * 4.6, rad = t * R * .92;
+        const x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad * .42;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+  // the bulge in the middle
+  const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * .17);
+  core.addColorStop(0, "rgba(255,252,236,1)");
+  core.addColorStop(.45, "rgba(255,222,150,.72)");
+  core.addColorStop(1, "rgba(255,190,110,0)");
+  ctx.fillStyle = core;
+  ctx.save(); ctx.translate(cx, cy); ctx.scale(1, .62); ctx.translate(-cx, -cy);
+  ctx.beginPath(); ctx.arc(cx, cy, R * .17, 0, TAU); ctx.fill();
+  ctx.restore();
+  galaxyTex = cv;
+  return cv;
+}
+
+/* ════════════════════════════════════════════════════════════
+   THE GAME
+   ════════════════════════════════════════════════════════════ */
+const cv = document.getElementById("sky");
+const ctx = cv.getContext("2d");
+const $ = id => document.getElementById(id);
+
+let W = 0, H = 0, DPR = 1;
+function resize(){
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  cv.style.width = W + "px"; cv.style.height = H + "px";
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+addEventListener("resize", resize);
+resize();
+
+const G = {
+  on: false, who: "earth", bodies: [], t: 0,
+  cam: { x: 0, y: 0, scale: 1 },
+  shake: 0, eaten: 0, best: 0, started: 0,
+  galaxy: null, swallowing: 0, over: false, wantGalaxy: false, hunted: false
+};
+const P = { x: 0, y: 0, vx: 0, vy: 0, r: 14, safe: 0, tex: null, texR: 0 };
+const aim = { x: 0, y: 0, has: false };
+const keys = new Set();
+
+function seedOf(){ return (Math.random() * 1e9) | 0; }
+
+function viewRadius(){ return Math.hypot(W, H) / 2 / G.cam.scale; }
+/* Spawning uses the size the camera is heading for, not the one it is on.
+   If the two drift apart, food can appear inside you and be eaten instantly. */
+function spawnRadius(){ return Math.hypot(W, H) / 2 / scaleFor(P.r); }
+
+function scaleFor(r){ return clamp(3.1 * Math.pow(12 / r, .72), .045, 3.1); }
+
+function newBody(target, onScreen){
+  const r = clamp(target, 3, 900);
+  const kind = kindFor(r);
+  const list = NAMES[kind];
+  const pick = list[(Math.random() * list.length) | 0];
+  const ang = Math.random() * TAU;
+  /* the very first fill lands in view, or you start staring at nothing.
+     After that they come in from just beyond the edge. */
+  const reach = spawnRadius();
+  const dist = onScreen
+    ? Math.max(P.r * 2.2, reach * (.30 + Math.random() * 1.3))
+    : reach * (1.05 + Math.random() * .65);
+  const drift = 14 + Math.random() * 26;
+  const da = Math.random() * TAU;
+  return {
+    x: P.x + Math.cos(ang) * dist,
+    y: P.y + Math.sin(ang) * dist,
+    vx: Math.cos(da) * drift, vy: Math.sin(da) * drift,
+    r, kind, seed: seedOf(), name: pick[0], km: pick[1],
+    spin: (Math.random() - .5) * .3
+  };
+}
+
+function topUp(onScreen){
+  const want = 52;
+  let holes = 0;
+  for (const b of G.bodies) if (b.kind === "hole") holes++;
+  while (G.bodies.length < want){
+    const roll = Math.random();
+    let t;
+    if (roll < .68) t = P.r * (.16 + Math.random() * .66);        // something to eat
+    else if (roll < .88) t = P.r * (.86 + Math.random() * .26);   // too close to call
+    else t = P.r * (1.22 + Math.random() * .52);                  // too big for you
+    /* four is plenty. More than that and they overlap into one black smear. */
+    if (t >= KINDS.hole.min){
+      if (holes >= 4) t = KINDS.star.min + Math.random() * (KINDS.star.max - KINDS.star.min);
+      else holes++;
+    }
+    G.bodies.push(newBody(t, onScreen));
+  }
+}
+
+function tierIndex(r){
+  let i = 0;
+  for (let k = 0; k < TIERS.length; k++) if (r >= TIERS[k].at) i = k;
+  return i;
+}
+
+let flashTimer = 0;
+function flash(msg, colour){
+  const el = $("flash");
+  el.textContent = msg;
+  el.style.color = colour || "var(--ink)";
+  el.setAttribute("data-on", "");
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => el.removeAttribute("data-on"), 2000);
+}
+
+function start(who){
+  G.who = who;
+  const w = WHO[who];
+  G.on = true; G.over = false;
+  G.bodies = []; G.eaten = 0; G.t = 0; G.shake = 0;
+  G.galaxy = null; G.swallowing = 0; G.wantGalaxy = false; G.hunted = false;
+  G.started = performance.now();
+  P.x = 0; P.y = 0; P.vx = 0; P.vy = 0; P.r = w.start; P.safe = 0;
+  P.tex = null; P.texR = 0;
+  aim.has = false;
+  G.cam.scale = scaleFor(P.r); G.cam.x = 0; G.cam.y = 0;
+  topUp(true);
+  $("hud").hidden = false;
+  document.querySelectorAll(".screen").forEach(s => s.removeAttribute("data-on"));
+  flash(w.hello, "var(--cold)");
+}
+
+function finish(won){
+  G.on = false; G.over = true;
+  $("hud").hidden = true;
+  $("warn").removeAttribute("data-on");
+  const secs = Math.max(1, Math.round((performance.now() - G.started) / 1000));
+  const stat = '<span class="chip">swallowed <b>' + G.eaten + '</b></span>' +
+               '<span class="chip">time <b>' + secs + 's</b></span>' +
+               '<span class="chip">eating <b>' + TIERS[tierIndex(P.r)].name + '</b></span>';
+  if (won){
+    $("won-note").textContent = "Every star in it, gone. There is nothing left out here that is bigger than you.";
+    $("won-stat").innerHTML = stat;
+    $("s-won").setAttribute("data-on", "");
+    SFX.win();
+  } else {
+    $("lost-note").textContent = "Something bigger got to you first. The trick is to keep away from anything you cannot fit in your mouth.";
+    $("lost-stat").innerHTML = stat;
+    $("s-lost").setAttribute("data-on", "");
+    SFX.gone();
+  }
+}
+
+/* ---------- one step of the world ---------- */
+function step(dt){
+  G.t += dt;
+  const w = WHO[G.who];
+
+  // where you are heading
+  let tx = aim.x, ty = aim.y;
+  if (keys.size){
+    let kx = 0, ky = 0;
+    if (keys.has("ArrowLeft") || keys.has("a")) kx -= 1;
+    if (keys.has("ArrowRight") || keys.has("d")) kx += 1;
+    if (keys.has("ArrowUp") || keys.has("w")) ky -= 1;
+    if (keys.has("ArrowDown") || keys.has("s")) ky += 1;
+    if (kx || ky){
+      const m = Math.hypot(kx, ky);
+      tx = P.x + kx / m * 400; ty = P.y + ky / m * 400;
+      aim.has = true;
+    }
+  }
+
+  const topSpeed = 250 * w.speed / G.cam.scale;
+  if (aim.has){
+    const dx = tx - P.x, dy = ty - P.y, d = Math.hypot(dx, dy) || 1;
+    const want = Math.min(1, d / (90 / G.cam.scale));
+    const ax = dx / d * topSpeed * want, ay = dy / d * topSpeed * want;
+    P.vx += (ax - P.vx) * Math.min(1, dt * 3.4);
+    P.vy += (ay - P.vy) * Math.min(1, dt * 3.4);
+  } else {
+    P.vx *= Math.pow(.2, dt); P.vy *= Math.pow(.2, dt);
+  }
+  P.x += P.vx * dt; P.y += P.vy * dt;
+  if (P.safe > 0) P.safe -= dt;
+
+  /* Once the hunt starts it stays started. Without this a bite dropped you
+     back under the threshold and switched the danger off again, so nothing
+     could ever finish you and the game could not be lost at all. */
+  if (P.r >= DANGER_AT) G.hunted = true;
+  const danger = G.hunted;
+  let nearest = Infinity;
+
+  for (let i = G.bodies.length - 1; i >= 0; i--){
+    const b = G.bodies[i];
+    if (!b) continue;
+
+    // a black hole drags its dinner in
+    if (G.who === "hole"){
+      const dx = P.x - b.x, dy = P.y - b.y, d = Math.hypot(dx, dy) || 1;
+      const reach = P.r * 7;
+      if (d < reach && b.r < P.r * .95){
+        const pull = 260 * (1 - d / reach) / G.cam.scale;
+        b.vx += dx / d * pull * dt; b.vy += dy / d * pull * dt;
+      }
+    }
+
+    // the giants come looking for you, once you are worth eating
+    const big = b.r > P.r * 1.12;
+    if (danger && big){
+      const dx = P.x - b.x, dy = P.y - b.y, d = Math.hypot(dx, dy) || 1;
+      if (d < P.r * 16){
+        const chase = topSpeed * .52;
+        b.vx += (dx / d * chase - b.vx) * Math.min(1, dt * .7);
+        b.vy += (dy / d * chase - b.vy) * Math.min(1, dt * .7);
+        nearest = Math.min(nearest, d - b.r - P.r);
+      }
+    }
+
+    b.x += b.vx * dt; b.y += b.vy * dt;
+
+    const dx = b.x - P.x, dy = b.y - P.y;
+    const d = Math.hypot(dx, dy);
+
+    if (b.r <= P.r * .88 && d < P.r + b.r * .15){
+      // swallowed
+      G.bodies.splice(i, 1);
+      const before = tierIndex(P.r);
+      /* how much of a meal you keep. At .82 the whole game was over in
+         about 22 mouthfuls; this puts a full run at roughly seventy. */
+      P.r = Math.sqrt(P.r * P.r + b.r * b.r * .30);
+      G.eaten++;
+      SFX.eat(clamp(b.r / P.r, 0, 1));
+      flash(b.name + " · " + kmText(b.km), "var(--good)");
+      const after = tierIndex(P.r);
+      if (after > before){
+        SFX.grow();
+        flash("Big enough to eat " + TIERS[after].name + " now", "var(--hot)");
+        if (after >= TIERS.length - 1 && !G.galaxy) G.wantGalaxy = true;
+      }
+      continue;
+    }
+
+    if (danger && big && P.safe <= 0 && d < P.r + b.r * .55){
+      // bitten
+      P.r = Math.sqrt(P.r * P.r * .74);
+      P.safe = 1.7;
+      G.shake = 15;
+      SFX.bite();
+      const away = Math.hypot(dx, dy) || 1;
+      P.vx = -dx / away * topSpeed * 1.3;
+      P.vy = -dy / away * topSpeed * 1.3;
+      b.vx = dx / away * 60; b.vy = dy / away * 60;
+      flash("Bitten by " + b.name + "!", "var(--danger)");
+      if (P.r < 9){ finish(false); return; }
+    }
+
+    if (d > viewRadius() * 2.6) G.bodies.splice(i, 1);
+  }
+
+  $("warn").toggleAttribute("data-on", danger && nearest < P.r * 2.4 && !G.galaxy);
+
+  /* only once the loop above has finished walking the list, or emptying it
+     here would leave it reading past the end */
+  if (G.wantGalaxy){ G.wantGalaxy = false; summonGalaxy(); }
+  if (!G.galaxy) topUp();
+  else stepGalaxy(dt);
+
+  G.cam.scale += (scaleFor(P.r) - G.cam.scale) * Math.min(1, dt * 2.2);
+  G.cam.x += (P.x - G.cam.x) * Math.min(1, dt * 6);
+  G.cam.y += (P.y - G.cam.y) * Math.min(1, dt * 6);
+  if (G.shake > 0) G.shake = Math.max(0, G.shake - dt * 26);
+
+  paintHud();
+}
+
+function summonGalaxy(){
+  const ang = Math.random() * TAU;
+  const d = viewRadius() * 1.5;
+  G.galaxy = { x: P.x + Math.cos(ang) * d, y: P.y + Math.sin(ang) * d, r: P.r * 4.2, spin: 0 };
+  G.bodies.length = 0;
+  flash("The Milky Way. Swallow it.", "var(--hot)");
+}
+
+function stepGalaxy(dt){
+  const g = G.galaxy;
+  g.spin += dt * .06;
+  if (G.swallowing > 0){
+    G.swallowing += dt;
+    g.r *= Math.pow(.12, dt);
+    P.r += dt * 130;
+    if (G.swallowing > 2.1){ finish(true); }
+    return;
+  }
+  const d = Math.hypot(g.x - P.x, g.y - P.y);
+  if (d < g.r * .5){
+    G.swallowing = .0001;
+    G.shake = 22;
+    SFX.eat(1);
+    flash("Swallowing the galaxy…", "var(--hot)");
+  }
+}
+
+function paintHud(){
+  const i = tierIndex(P.r);
+  $("tierName").textContent = "eating " + TIERS[i].name;
+  const next = TIERS[i + 1];
+  $("nextName").textContent = next ? "next: " + next.name : "nothing left";
+  const lo = TIERS[i].at, hi = next ? next.at : GALAXY_AT;
+  $("fill").style.width = clamp((P.r - lo) / (hi - lo) * 100, 0, 100) + "%";
+  $("sizeText").textContent = G.eaten + " swallowed";
+}
+/* ════════════════════════════════════════════════════════════
+   DRAWING THE SCREEN
+   ════════════════════════════════════════════════════════════ */
+const TILE = 900;
+const LAYERS = [];
+(function makeStars(){
+  const spec = [[.06, 170, .5, 1.1], [.16, 120, .8, 1.7], [.34, 80, 1, 2.4]];
+  spec.forEach(([depth, n, bright, size], li) => {
+    const r = new Rng(9000 + li * 77);
+    const pts = [];
+    for (let i = 0; i < n; i++)
+      pts.push([r.f(TILE), r.f(TILE), r.f(.25, 1) * bright, r.f(.4, size), r.f(TAU),
+                r.chance(.16) ? r.f(200, 230) : r.chance(.16) ? r.f(18, 44) : 0]);
+    const clouds = [];
+    if (li === 0) for (let i = 0; i < 5; i++)
+      clouds.push([r.f(TILE), r.f(TILE), r.f(180, 340), r.pick([258, 288, 210, 330, 196]), r.f(.05, .12)]);
+    LAYERS.push({ depth, pts, clouds });
+  });
+})();
+
+function drawSky(){
+  ctx.fillStyle = "#03050E";
+  ctx.fillRect(0, 0, W, H);
+  for (const L of LAYERS){
+    const ox = -(G.cam.x * L.depth) % TILE, oy = -(G.cam.y * L.depth) % TILE;
+    const x0 = Math.floor(-ox / TILE) - 1, x1 = Math.ceil((W - ox) / TILE) + 1;
+    const y0 = Math.floor(-oy / TILE) - 1, y1 = Math.ceil((H - oy) / TILE) + 1;
+    for (let tx = x0; tx <= x1; tx++)
+      for (let ty = y0; ty <= y1; ty++){
+        const bx = ox + tx * TILE, by = oy + ty * TILE;
+        for (const c of L.clouds){
+          const x = bx + c[0], y = by + c[1];
+          if (x < -c[2] || x > W + c[2] || y < -c[2] || y > H + c[2]) continue;
+          const g = ctx.createRadialGradient(x, y, 0, x, y, c[2]);
+          g.addColorStop(0, hsl(c[3], 70, 42, c[4]));
+          g.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(x, y, c[2], 0, TAU); ctx.fill();
+        }
+        for (const p of L.pts){
+          const x = bx + p[0], y = by + p[1];
+          if (x < -2 || x > W + 2 || y < -2 || y > H + 2) continue;
+          const tw = .72 + .28 * Math.sin(G.t * 1.6 + p[4]);
+          ctx.fillStyle = p[5]
+            ? hsl(p[5], 80, 80, p[2] * tw)
+            : "rgba(255,255,255," + (p[2] * tw).toFixed(3) + ")";
+          ctx.beginPath(); ctx.arc(x, y, p[3], 0, TAU); ctx.fill();
+        }
+      }
+  }
+}
+
+function stamp(kind, seed, x, y, r, alpha){
+  const k = KINDS[kind];
+  const want = r * 2 / k.fill;
+  const res = want > 240 ? 384 : want > 110 ? 256 : 160;
+  const tex = texture(kind, seed, res);
+  if (alpha !== undefined) ctx.globalAlpha = alpha;
+  ctx.drawImage(tex, x - want / 2, y - want / 2, want, want);
+  if (alpha !== undefined) ctx.globalAlpha = 1;
+}
+
+function draw(){
+  drawSky();
+  const s = G.cam.scale;
+  const shx = G.shake ? (Math.random() - .5) * G.shake : 0;
+  const shy = G.shake ? (Math.random() - .5) * G.shake : 0;
+  ctx.save();
+  ctx.translate(W / 2 + shx, H / 2 + shy);
+  ctx.scale(s, s);
+  ctx.translate(-G.cam.x, -G.cam.y);
+
+  if (G.galaxy){
+    const g = G.galaxy, tex = galaxyTexture();
+    const size = g.r * 2 / .47;
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(g.spin);
+    ctx.drawImage(tex, -size / 2, -size / 2, size, size);
+    ctx.restore();
+  }
+
+  const danger = G.hunted;
+  const edge = viewRadius() * 1.15;
+  for (const b of G.bodies){
+    if (Math.abs(b.x - G.cam.x) > edge + b.r || Math.abs(b.y - G.cam.y) > edge + b.r) continue;
+    stamp(b.kind, b.seed, b.x, b.y, b.r);
+    if (danger && b.r > P.r * 1.12){
+      ctx.strokeStyle = "rgba(255,54,74,.42)";
+      ctx.lineWidth = Math.max(1.2 / s, b.r * .022);
+      ctx.setLineDash([b.r * .30, b.r * .22]);
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 1.13, 0, TAU); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // you
+  const w = WHO[G.who];
+  if (!P.tex || Math.abs(P.r - P.texR) / P.texR > .4){
+    const cvv = document.createElement("canvas");
+    cvv.width = cvv.height = 384;
+    w.paint(cvv.getContext("2d"), 384);
+    P.tex = cvv; P.texR = P.r;
+  }
+  const blink = P.safe > 0 && Math.floor(G.t * 12) % 2 === 0;
+  const want = P.r * 2 / w.fill;
+  ctx.globalAlpha = blink ? .38 : 1;
+  ctx.drawImage(P.tex, P.x - want / 2, P.y - want / 2, want, want);
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+}
+/* ════════════════════════════════════════════════════════════
+   HANDS ON
+   ════════════════════════════════════════════════════════════ */
+function toWorld(px, py){
+  return { x: (px - W / 2) / G.cam.scale + G.cam.x, y: (py - H / 2) / G.cam.scale + G.cam.y };
+}
+function setAim(e){
+  const p = toWorld(e.clientX, e.clientY);
+  aim.x = p.x; aim.y = p.y; aim.has = true;
+}
+cv.addEventListener("pointermove", e => { if (G.on) setAim(e); });
+cv.addEventListener("pointerdown", e => { if (G.on){ cv.setPointerCapture(e.pointerId); setAim(e); } });
+cv.addEventListener("touchmove", e => { if (G.on) e.preventDefault(); }, { passive: false });
+addEventListener("keydown", e => {
+  if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].indexOf(e.key) >= 0) e.preventDefault();
+  keys.add(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+});
+addEventListener("keyup", e => keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key));
+addEventListener("blur", () => keys.clear());
+
+/* ---------- who you are ---------- */
+let chosen = "earth";
+(function buildPicker(){
+  const host = document.getElementById("picks");
+  Object.keys(WHO).forEach(key => {
+    const w = WHO[key];
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pick";
+    b.setAttribute("aria-pressed", String(key === chosen));
+    const c = document.createElement("canvas");
+    c.width = c.height = 172;
+    w.paint(c.getContext("2d"), 172);
+    b.appendChild(c);
+    const nm = document.createElement("b"); nm.textContent = w.label;
+    const sm = document.createElement("small"); sm.textContent = w.blurb;
+    b.appendChild(nm); b.appendChild(sm);
+    b.addEventListener("click", () => {
+      chosen = key;
+      SFX.tap();
+      host.querySelectorAll(".pick").forEach(o => o.setAttribute("aria-pressed", "false"));
+      b.setAttribute("aria-pressed", "true");
+    });
+    host.appendChild(b);
+  });
+})();
+
+document.getElementById("play").addEventListener("click", () => { SFX.tap(); start(chosen); });
+document.getElementById("again").addEventListener("click", () => { SFX.tap(); showTitle(); });
+document.getElementById("again2").addEventListener("click", () => { SFX.tap(); showTitle(); });
+function showTitle(){
+  document.querySelectorAll(".screen").forEach(s => s.removeAttribute("data-on"));
+  document.getElementById("s-title").setAttribute("data-on", "");
+  document.getElementById("hud").hidden = true;
+}
+
+const muteBtn = document.getElementById("mute");
+function paintMute(){
+  muteBtn.textContent = muted ? "🔇" : "🔊";
+  muteBtn.setAttribute("aria-pressed", String(muted));
+  muteBtn.setAttribute("aria-label", muted ? "Turn sound on" : "Turn sound off");
+}
+muteBtn.addEventListener("click", () => {
+  muted = !muted;
+  try { localStorage.setItem("planet-eater-muted", muted ? "1" : "0"); } catch (e) {}
+  paintMute();
+  if (!muted) SFX.tap();
+});
+paintMute();
+
+/* ---------- the loop ---------- */
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(.05, (now - last) / 1000);
+  last = now;
+  if (G.on) step(dt); else G.t += dt;
+  draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* something to look at behind the title screen */
+(function idleSky(){
+  G.cam.scale = .8;
+  const drift = () => { if (!G.on){ G.cam.x += .35; G.cam.y += .12; } requestAnimationFrame(drift); };
+  drift();
+})();
+</script>
