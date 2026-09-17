@@ -29,7 +29,13 @@ down.
    edges of the screen go red when one is close.
 6. A giant that catches you tears a chunk off rather than finishing you on the
    spot. Get bitten enough times and you are gone.
-7. Reach the top and the Milky Way itself turns up.
+7. Get big enough and whole galaxies start turning up, one after another, each
+   bigger than the last. Six of them, ending on IC 1101.
+8. **There is a wall round the arena.** It grows as you do, so it always feels
+   the same size, and you cannot be chased off the edge of the world. You can
+   be cornered against it, though.
+9. **The little round map** in the corner shows the whole arena: green is food,
+   red will eat you, gold is the galaxy, white is you.
 
 Move with a finger, a mouse, or the arrow keys.
 
@@ -56,6 +62,21 @@ On top of that:
   you, a ring of light at the edge, and nothing at all in the middle
 - **the galaxy** is four arms of about twenty thousand dots, with dust lanes
   cut through them and a bright bulge in the middle
+
+## Six galaxies, in the order you meet them
+
+| | Really is |
+| --- | --- |
+| the Small Magellanic Cloud | 18,900 light years across |
+| the Large Magellanic Cloud | 32,200 |
+| Triangulum | 60,000 |
+| the Milky Way | 105,700 |
+| Andromeda | 220,000 |
+| IC 1101 | 3.9 million, one of the largest anyone has found |
+
+The two Magellanic Clouds really do orbit the Milky Way, which is why they turn
+up before it. Each one is drawn with a different number of arms and its own
+colour, and swallowing one makes you a quarter bigger again.
 
 ## The names are real
 
@@ -84,8 +105,20 @@ for it to be harder. Those three fight each other, and the robot found out how:
   and hardening the hunt at the same time made it impossible twice over before
   it settled.
 
-Where it landed: the robot wins about six games in nine, and the three
-characters come out roughly even.
+- **How a meal is worth** was the root of all of it. Growth went by area,
+  which squares the size of the meal, so a crumb counted for nothing and
+  whichever food happened to be nearest decided everything. The same run took
+  the black hole one minute and the Earth twenty. Straight proportion fixed it:
+  the spread collapsed to 1.5 to 3 minutes.
+- **The bite is tied to how fast you grow.** Lengthen the game without touching
+  it and the same fifty bites wipe out half the run. It is set to cost about
+  four meals.
+- **Food used to be capped at a fixed size**, so once you were bigger than that
+  every meal was a crumb and the last stretch took two thousand of them.
+
+Where it landed: a game runs five to thirteen minutes for the robot, which wins
+about five in nine. A child will take longer, since the robot never once dodges
+anything.
 
 ## Things that had to be fixed
 

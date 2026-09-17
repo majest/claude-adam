@@ -98,7 +98,8 @@ h2{font-family:"Orbitron",Impact,sans-serif;font-weight:600;font-size:clamp(17px
   display:flex;flex-direction:column;gap:7px;align-items:center;
 }
 .bar{
-  width:min(560px,94vw);height:34px;border-radius:999px;position:relative;overflow:hidden;
+  /* leave room for the sound button, or the right-hand label hides under it */
+  width:min(560px, calc(100vw - 96px));height:34px;border-radius:999px;position:relative;overflow:hidden;
   background:rgba(8,14,32,.72);border:1px solid var(--edge);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
 }
@@ -186,7 +187,8 @@ details li{margin-bottom:5px}
       <li>While you are small, nothing can hurt you.</li>
       <li>Once you are big enough to eat planets, the giants start hunting you. The screen goes red when one is close.</li>
       <li>If a giant catches you it tears a chunk off. Get too small and you are gone.</li>
-      <li>Reach the very top and the Milky Way itself turns up.</li>
+      <li>Get big enough and whole galaxies start turning up, one after another,
+          each bigger than the last. Eat all six.</li>
     </ol>
   </details>
 </section>
@@ -201,7 +203,7 @@ details li{margin-bottom:5px}
 
 <!-- ░░ WON ░░ -->
 <section class="screen" id="s-won">
-  <h1>The Milky Way<br>is gone</h1>
+  <h1>Every galaxy<br>is gone</h1>
   <p class="sub" id="won-note"></p>
   <div class="stat" id="won-stat"></div>
   <button class="btn" id="again2">Play again</button>
@@ -725,7 +727,7 @@ const KINDS = {
   rocky: { paint: paintRocky, fill: .86, min: 26,  max: 58 },
   giant: { paint: paintGiant, fill: .80, min: 58,  max: 150 },
   star:  { paint: paintStar,  fill: .60, min: 150, max: 430 },
-  hole:  { paint: paintHole,  fill: .32, min: 430, max: 1000 }
+  hole:  { paint: paintHole,  fill: .32, min: 430, max: Infinity }
 };
 const KIND_ORDER = ["rock", "moon", "rocky", "giant", "star", "hole"];
 function kindFor(r){
@@ -768,7 +770,22 @@ const TIERS = [
   { at: 489, name: "stars" },
   { at: 800, name: "the galaxy" }
 ];
-const GALAXY_AT = 800;
+/* Real galaxies, in the order you meet them, with their real widths. The two
+   Magellanic Clouds really do orbit the Milky Way, so they come first, and
+   IC 1101 really is one of the largest anyone has found. */
+const GALAXIES = [
+  { name: "the Small Magellanic Cloud", ly: 18900,   at: 800,  arms: 1, hue: 210, seed: 101 },
+  { name: "the Large Magellanic Cloud", ly: 32200,   at: 1100, arms: 2, hue: 190, seed: 202 },
+  { name: "Triangulum",                 ly: 60000,   at: 1500, arms: 3, hue: 34,  seed: 303 },
+  { name: "the Milky Way",              ly: 105700,  at: 2050, arms: 4, hue: 42,  seed: 404 },
+  { name: "Andromeda",                  ly: 220000,  at: 2800, arms: 5, hue: 24,  seed: 505 },
+  { name: "IC 1101",                    ly: 3900000, at: 3800, arms: 6, hue: 16,  seed: 606 }
+];
+const GALAXY_AT = GALAXIES[0].at;
+function lyText(n){
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + " million light years across";
+  return Math.round(n).toLocaleString("en-GB") + " light years across";
+}
 const DANGER_AT = 66;          // nothing hunts you until you can swallow planets
 
 const WHO = {
@@ -778,8 +795,8 @@ const WHO = {
   earth: { label: "Earth",      start: 14, speed: 1.08, paint: paintEarth,
            fill: .86, blurb: "Steady, and starts a bit bigger.",
            hello: "You are the Earth. Eat anything smaller than you." },
-  hole:  { label: "Black hole", start: 12, speed: .90,  paint: (c,S) => paintHole(c, S, 5),
-           fill: .32, blurb: "Slow, but drags food towards you.",
+  hole:  { label: "Black hole", start: 12, speed: 1.02,  paint: (c,S) => paintHole(c, S, 5),
+           fill: .32, blurb: "Drags food in, so you barely chase.",
            hello: "You are a black hole. Food comes to you." }
 };
 
@@ -799,22 +816,23 @@ function texture(kind, seed, size){
   return cv;
 }
 
-let galaxyTex = null;
-function galaxyTexture(){
-  if (galaxyTex) return galaxyTex;
+const galaxyTex = new Map();
+function galaxyTexture(spec){
+  const had = galaxyTex.get(spec.seed);
+  if (had) return had;
   const S = 1100, cv = document.createElement("canvas");
   cv.width = cv.height = S;
-  const ctx = cv.getContext("2d"), r = new Rng(31415), cx = S / 2, cy = S / 2;
+  const ctx = cv.getContext("2d"), r = new Rng(spec.seed), cx = S / 2, cy = S / 2;
   const R = S * .47;
   // the glow of a hundred billion suns
   const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
   halo.addColorStop(0, "rgba(255,244,214,.95)");
-  halo.addColorStop(.09, "rgba(255,226,170,.55)");
+  halo.addColorStop(.09, hsl(spec.hue, 90, 72, .55));
   halo.addColorStop(.32, "rgba(150,170,255,.20)");
   halo.addColorStop(1, "rgba(30,40,90,0)");
   ctx.fillStyle = halo; ctx.fillRect(0, 0, S, S);
   // four arms of stars, wound round
-  const ARMS = 4;
+  const ARMS = spec.arms;
   for (let a = 0; a < ARMS; a++){
     const off = a / ARMS * TAU;
     for (let i = 0; i < 5200; i++){
@@ -824,7 +842,7 @@ function galaxyTexture(){
       const x = cx + Math.cos(ang) * rad;
       const y = cy + Math.sin(ang) * rad * .42;      // seen at an angle
       const near = 1 - t;
-      const hue = r.chance(.25) ? r.f(200, 230) : r.f(28, 52);
+      const hue = r.chance(.25) ? r.f(200, 230) : spec.hue + r.f(-12, 12);
       ctx.fillStyle = hsl(hue, r.f(40, 90), r.f(62, 94), r.f(.10, .55) * (.35 + near));
       const rr = r.f(.6, 2.3);
       ctx.beginPath(); ctx.arc(x, y, rr, 0, TAU); ctx.fill();
@@ -854,7 +872,7 @@ function galaxyTexture(){
   ctx.save(); ctx.translate(cx, cy); ctx.scale(1, .62); ctx.translate(-cx, -cy);
   ctx.beginPath(); ctx.arc(cx, cy, R * .17, 0, TAU); ctx.fill();
   ctx.restore();
-  galaxyTex = cv;
+  galaxyTex.set(spec.seed, cv);
   return cv;
 }
 
@@ -880,7 +898,7 @@ const G = {
   on: false, who: "earth", bodies: [], t: 0,
   cam: { x: 0, y: 0, scale: 1 },
   shake: 0, eaten: 0, best: 0, started: 0,
-  galaxy: null, swallowing: 0, over: false, wantGalaxy: false, hunted: false
+  galaxy: null, swallowing: 0, over: false, wantGalaxy: false, hunted: false, ate: 0
 };
 const P = { x: 0, y: 0, vx: 0, vy: 0, r: 14, safe: 0, tex: null, texR: 0 };
 const aim = { x: 0, y: 0, has: false };
@@ -892,11 +910,16 @@ function viewRadius(){ return Math.hypot(W, H) / 2 / G.cam.scale; }
 /* Spawning uses the size the camera is heading for, not the one it is on.
    If the two drift apart, food can appear inside you and be eaten instantly. */
 function spawnRadius(){ return Math.hypot(W, H) / 2 / scaleFor(P.r); }
+/* The wall sits a little beyond where things appear, and grows as you do, so
+   the arena always feels the same size however big you get. */
+function worldRadius(){ return spawnRadius() * 2.3; }
 
 function scaleFor(r){ return clamp(3.1 * Math.pow(12 / r, .72), .045, 3.1); }
 
 function newBody(target, onScreen){
-  const r = clamp(target, 3, 900);
+  /* No upper cap. It used to stop at 900, so once you were bigger than that
+     every meal was a crumb and the last stretch took two thousand of them. */
+  const r = Math.max(3, target);
   const kind = kindFor(r);
   const list = NAMES[kind];
   const pick = list[(Math.random() * list.length) | 0];
@@ -904,14 +927,19 @@ function newBody(target, onScreen){
   /* the very first fill lands in view, or you start staring at nothing.
      After that they come in from just beyond the edge. */
   const reach = spawnRadius();
-  const dist = onScreen
+  let dist = onScreen
     ? Math.max(P.r * 2.2, reach * (.30 + Math.random() * 1.3))
     : reach * (1.05 + Math.random() * .65);
   const drift = 14 + Math.random() * 26;
   const da = Math.random() * TAU;
+  // never outside the wall, or it would be shoved straight back at you
+  let px = P.x + Math.cos(ang) * dist, py = P.y + Math.sin(ang) * dist;
+  const lip = worldRadius() - r;
+  const far = Math.hypot(px, py);
+  if (far > lip){ const k = lip / (far || 1); px *= k; py *= k; }
   return {
-    x: P.x + Math.cos(ang) * dist,
-    y: P.y + Math.sin(ang) * dist,
+    x: px,
+    y: py,
     vx: Math.cos(da) * drift, vy: Math.sin(da) * drift,
     r, kind, seed: seedOf(), name: pick[0], km: pick[1],
     spin: (Math.random() - .5) * .3
@@ -958,7 +986,7 @@ function start(who){
   const w = WHO[who];
   G.on = true; G.over = false;
   G.bodies = []; G.eaten = 0; G.t = 0; G.shake = 0;
-  G.galaxy = null; G.swallowing = 0; G.wantGalaxy = false; G.hunted = false;
+  G.galaxy = null; G.swallowing = 0; G.wantGalaxy = false; G.hunted = false; G.ate = 0;
   G.started = performance.now();
   P.x = 0; P.y = 0; P.vx = 0; P.vy = 0; P.r = w.start; P.safe = 0;
   P.tex = null; P.texR = 0;
@@ -977,9 +1005,9 @@ function finish(won){
   const secs = Math.max(1, Math.round((performance.now() - G.started) / 1000));
   const stat = '<span class="chip">swallowed <b>' + G.eaten + '</b></span>' +
                '<span class="chip">time <b>' + secs + 's</b></span>' +
-               '<span class="chip">eating <b>' + TIERS[tierIndex(P.r)].name + '</b></span>';
+               '<span class="chip">galaxies <b>' + G.ate + '</b></span>';
   if (won){
-    $("won-note").textContent = "Every star in it, gone. There is nothing left out here that is bigger than you.";
+    $("won-note").textContent = "All six of them, down to the last star. There is nothing left out here that is bigger than you.";
     $("won-stat").innerHTML = stat;
     $("s-won").setAttribute("data-on", "");
     SFX.win();
@@ -1023,6 +1051,16 @@ function step(dt){
   }
   P.x += P.vx * dt; P.y += P.vy * dt;
   if (P.safe > 0) P.safe -= dt;
+
+  // you cannot leave. Bump the wall and you are turned back.
+  const wall = worldRadius() - P.r;
+  const out = Math.hypot(P.x, P.y);
+  if (out > wall){
+    const k = wall / out;
+    P.x *= k; P.y *= k;
+    const push = (P.x * P.vx + P.y * P.vy) / (out * out || 1);
+    if (push > 0){ P.vx -= P.x * push; P.vy -= P.y * push; }
+  }
 
   /* Once the hunt starts it stays started. Without this a bite dropped you
      back under the threshold and switched the danger off again, so nothing
@@ -1071,6 +1109,16 @@ function step(dt){
 
     b.x += b.vx * dt; b.y += b.vy * dt;
 
+    // everything else is kept inside too, or the sky empties out
+    const edge = worldRadius() - b.r * .5;
+    const far = Math.hypot(b.x, b.y);
+    if (far > edge){
+      const k = edge / far;
+      b.x *= k; b.y *= k;
+      const push = (b.x * b.vx + b.y * b.vy) / (far * far || 1);
+      if (push > 0){ b.vx -= b.x * push * 2; b.vy -= b.y * push * 2; }
+    }
+
     const dx = b.x - P.x, dy = b.y - P.y;
     const d = Math.hypot(dx, dy);
 
@@ -1078,10 +1126,14 @@ function step(dt){
       // swallowed
       G.bodies.splice(i, 1);
       const before = tierIndex(P.r);
-      /* How much of a meal you keep. This is the dial that sets how long a
-         game is. At .82 it was over in about 22 mouthfuls. Adam asked for a
-         longer game, so it is now .12, which is roughly 350. */
-      P.r = Math.sqrt(P.r * P.r + b.r * b.r * .12);
+      /* How much a meal is worth, and the dial that sets how long a game is.
+         It used to go by area, which squares the size of the meal, so a crumb
+         counted for almost nothing. Whichever food happened to be nearest then
+         decided everything: the same run took the black hole 1 minute and the
+         Earth 20. Straight proportion is far steadier, and a crumb still counts.
+         The number is the length of the game: .05 is about 280 mouthfuls,
+         .022 about 650. Adam asked twice for longer. */
+      P.r *= 1 + .022 * (b.r / P.r);
       G.eaten++;
       SFX.eat(clamp(b.r / P.r, 0, 1));
       flash(b.name + " · " + kmText(b.km), "var(--good)");
@@ -1089,17 +1141,16 @@ function step(dt){
       if (after > before){
         SFX.grow();
         flash("Big enough to eat " + TIERS[after].name + " now", "var(--hot)");
-        if (after >= TIERS.length - 1 && !G.galaxy) G.wantGalaxy = true;
       }
       continue;
     }
 
     if (danger && big && P.safe <= 0 && d < P.r + b.r * .55){
       // bitten
-      /* One bite already undoes three or four meals, so this is the wrong dial
-         to make the game hard with: turn it up and the game simply cannot be
-         won. The difficulty comes from more hunters and faster prey instead. */
-      P.r = Math.sqrt(P.r * P.r * .86);
+      /* A bite has to cost about four meals. It is tied to how fast you grow:
+         make the game longer without touching this and the same fifty bites
+         suddenly wipe out half the run, which is what happened. */
+      P.r *= .955;
       P.safe = 2.2;
       G.shake = 15;
       SFX.bite();
@@ -1116,11 +1167,11 @@ function step(dt){
 
   $("warn").toggleAttribute("data-on", danger && nearest < P.r * 2.4 && !G.galaxy);
 
-  /* only once the loop above has finished walking the list, or emptying it
-     here would leave it reading past the end */
-  if (G.wantGalaxy){ G.wantGalaxy = false; summonGalaxy(); }
-  if (!G.galaxy) topUp();
-  else stepGalaxy(dt);
+  /* the next galaxy turns up the moment you are big enough for it */
+  const nextGalaxy = GALAXIES[G.ate];
+  if (!G.galaxy && nextGalaxy && P.r >= nextGalaxy.at) summonGalaxy();
+  topUp();                      // there is still ordinary food between galaxies
+  if (G.galaxy) stepGalaxy(dt);
 
   G.cam.scale += (scaleFor(P.r) - G.cam.scale) * Math.min(1, dt * 2.2);
   G.cam.x += (P.x - G.cam.x) * Math.min(1, dt * 6);
@@ -1131,11 +1182,14 @@ function step(dt){
 }
 
 function summonGalaxy(){
+  const spec = GALAXIES[G.ate];
+  if (!spec) return;
   const ang = Math.random() * TAU;
   const d = viewRadius() * 1.5;
-  G.galaxy = { x: P.x + Math.cos(ang) * d, y: P.y + Math.sin(ang) * d, r: P.r * 4.2, spin: 0 };
-  G.bodies.length = 0;
-  flash("The Milky Way. Swallow it.", "var(--hot)");
+  /* the worlds stay put: you still need something to eat between galaxies */
+  G.galaxy = { x: P.x + Math.cos(ang) * d, y: P.y + Math.sin(ang) * d,
+               r: P.r * (2.6 + G.ate * .3), spin: 0, spec };
+  flash(spec.name.replace(/^the /, "The ") + ". Go and get it.", "var(--hot)");
 }
 
 function stepGalaxy(dt){
@@ -1144,8 +1198,18 @@ function stepGalaxy(dt){
   if (G.swallowing > 0){
     G.swallowing += dt;
     g.r *= Math.pow(.12, dt);
-    P.r += dt * 130;
-    if (G.swallowing > 2.1){ finish(true); }
+    if (G.swallowing > 1.6){
+      // down it goes, and you come out of it a good deal bigger
+      P.r *= 1.25;
+      G.ate++;
+      G.galaxy = null;
+      G.swallowing = 0;
+      const eaten = GALAXIES[G.ate - 1];
+      SFX.grow();
+      if (G.ate >= GALAXIES.length){ finish(true); return; }
+      flash(eaten.name.replace(/^the /, "The ") + " · " + lyText(eaten.ly), "var(--good)");
+      topUp();
+    }
     return;
   }
   const d = Math.hypot(g.x - P.x, g.y - P.y);
@@ -1153,17 +1217,27 @@ function stepGalaxy(dt){
     G.swallowing = .0001;
     G.shake = 22;
     SFX.eat(1);
-    flash("Swallowing the galaxy…", "var(--hot)");
+    flash("Swallowing " + g.spec.name + "…", "var(--hot)");
   }
 }
 
 function paintHud(){
-  const i = tierIndex(P.r);
-  $("tierName").textContent = "eating " + TIERS[i].name;
-  const next = TIERS[i + 1];
-  $("nextName").textContent = next ? "next: " + next.name : "nothing left";
-  const lo = TIERS[i].at, hi = next ? next.at : GALAXY_AT;
-  $("fill").style.width = clamp((P.r - lo) / (hi - lo) * 100, 0, 100) + "%";
+  const next = GALAXIES[G.ate];
+  if (G.ate > 0 || P.r >= GALAXIES[0].at * .55){
+    // into the galaxies now, so the bar counts those instead
+    $("tierName").textContent = G.ate ? G.ate + (G.ate === 1 ? " galaxy" : " galaxies") : "eating stars";
+    $("nextName").textContent = next ? "next: " + next.name : "nothing left";
+    const lo = G.ate ? GALAXIES[G.ate - 1].at : 0;
+    const hi = next ? next.at : P.r;
+    $("fill").style.width = clamp((P.r - lo) / (hi - lo) * 100, 0, 100) + "%";
+  } else {
+    const i = tierIndex(P.r);
+    $("tierName").textContent = "eating " + TIERS[i].name;
+    const t = TIERS[i + 1];
+    $("nextName").textContent = t ? "next: " + t.name : "next: galaxies";
+    const lo = TIERS[i].at, hi = t ? t.at : GALAXY_AT;
+    $("fill").style.width = clamp((P.r - lo) / (hi - lo) * 100, 0, 100) + "%";
+  }
   $("sizeText").textContent = G.eaten + " swallowed";
 }
 /* ════════════════════════════════════════════════════════════
@@ -1239,7 +1313,7 @@ function draw(){
   ctx.translate(-G.cam.x, -G.cam.y);
 
   if (G.galaxy){
-    const g = G.galaxy, tex = galaxyTexture();
+    const g = G.galaxy, tex = galaxyTexture(g.spec);
     const size = g.r * 2 / .47;
     ctx.save();
     ctx.translate(g.x, g.y);
@@ -1247,6 +1321,26 @@ function draw(){
     ctx.drawImage(tex, -size / 2, -size / 2, size, size);
     ctx.restore();
   }
+
+  // the wall, brighter the closer you are to it
+  const wallR = worldRadius();
+  const gap = wallR - Math.hypot(P.x, P.y) - P.r;
+  const near = clamp(1 - gap / (wallR * .30), 0, 1);
+  ctx.save();
+  ctx.strokeStyle = "rgba(120,190,255," + (.10 + near * .55).toFixed(3) + ")";
+  ctx.lineWidth = Math.max(1.5 / s, wallR * .006);
+  ctx.setLineDash([wallR * .05, wallR * .028]);
+  ctx.lineDashOffset = -G.t * wallR * .01;
+  ctx.beginPath(); ctx.arc(0, 0, wallR, 0, TAU); ctx.stroke();
+  ctx.setLineDash([]);
+  if (near > .01){
+    const glow = ctx.createRadialGradient(0, 0, wallR * .88, 0, 0, wallR * 1.06);
+    glow.addColorStop(0, "rgba(90,170,255,0)");
+    glow.addColorStop(1, "rgba(90,170,255," + (near * .22).toFixed(3) + ")");
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(0, 0, wallR * 1.06, 0, TAU); ctx.fill();
+  }
+  ctx.restore();
 
   const danger = G.hunted;
   const edge = viewRadius() * 1.15;
@@ -1276,6 +1370,53 @@ function draw(){
   ctx.drawImage(P.tex, P.x - want / 2, P.y - want / 2, want, want);
   ctx.globalAlpha = 1;
 
+  ctx.restore();
+  if (G.on) drawMiniMap();
+}
+
+/* A small round chart of the whole arena, so you can see what is out there
+   without flying around looking for it. Green is food, red will eat you. */
+function drawMiniMap(){
+  const pad = 12;
+  const R = Math.min(74, Math.min(W, H) * .17);
+  const cx = W - R - pad, cy = H - R - pad - 4;
+  const wallR = worldRadius();
+  const k = R / wallR;
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU);
+  ctx.fillStyle = "rgba(6,10,26,.66)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(120,190,255,.32)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.clip();
+
+  for (const b of G.bodies){
+    const x = cx + b.x * k, y = cy + b.y * k;
+    const big = b.r > P.r * 1.12;
+    const food = b.r <= P.r * .86;
+    if (!big && !food) continue;
+    ctx.fillStyle = big ? "rgba(255,80,96,.85)" : "rgba(92,224,138,.7)";
+    ctx.beginPath();
+    ctx.arc(x, y, clamp(b.r * k, big ? 1.8 : 1.2, 5), 0, TAU);
+    ctx.fill();
+  }
+  if (G.galaxy){
+    const x = cx + G.galaxy.x * k, y = cy + G.galaxy.y * k;
+    ctx.fillStyle = "rgba(255,210,120,.95)";
+    ctx.beginPath(); ctx.arc(x, y, 4.5, 0, TAU); ctx.fill();
+    ctx.strokeStyle = "rgba(255,210,120,.5)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(x, y, 8 + Math.sin(G.t * 3) * 2, 0, TAU); ctx.stroke();
+  }
+  // you
+  const px = cx + P.x * k, py = cy + P.y * k;
+  ctx.fillStyle = "#EAF0FF";
+  ctx.beginPath(); ctx.arc(px, py, 3.4, 0, TAU); ctx.fill();
+  ctx.strokeStyle = "rgba(234,240,255,.8)";
+  ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.arc(px, py, 6.5, 0, TAU); ctx.stroke();
   ctx.restore();
 }
 /* ════════════════════════════════════════════════════════════
