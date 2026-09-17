@@ -181,6 +181,8 @@ details li{margin-bottom:5px}
       <li>Move with your finger, your mouse, or the arrow keys. You always drift towards it.</li>
       <li>Touch anything <b>smaller</b> than you and you swallow it and grow.</li>
       <li>Anything <b>bigger</b> is too big to eat. Leave it alone.</li>
+      <li>Everything smaller runs away from you, so you have to chase it down.
+          A black hole drags it back instead.</li>
       <li>While you are small, nothing can hurt you.</li>
       <li>Once you are big enough to eat planets, the giants start hunting you. The screen goes red when one is close.</li>
       <li>If a giant catches you it tears a chunk off. Get too small and you are gone.</li>
@@ -764,19 +766,19 @@ const TIERS = [
   { at: 66,  name: "planets" },
   { at: 170, name: "gas giants" },
   { at: 489, name: "stars" },
-  { at: 620, name: "the galaxy" }
+  { at: 800, name: "the galaxy" }
 ];
-const GALAXY_AT = 620;
+const GALAXY_AT = 800;
 const DANGER_AT = 66;          // nothing hunts you until you can swallow planets
 
 const WHO = {
   moon:  { label: "Moon",       start: 11, speed: 1.28, paint: (c,S) => paintMoon(c, S, 77),
            fill: .91, blurb: "Small and quick. Hard to catch.",
            hello: "You are a moon. Eat anything smaller than you." },
-  earth: { label: "Earth",      start: 14, speed: 1.00, paint: paintEarth,
+  earth: { label: "Earth",      start: 14, speed: 1.08, paint: paintEarth,
            fill: .86, blurb: "Steady, and starts a bit bigger.",
            hello: "You are the Earth. Eat anything smaller than you." },
-  hole:  { label: "Black hole", start: 12, speed: .82,  paint: (c,S) => paintHole(c, S, 5),
+  hole:  { label: "Black hole", start: 12, speed: .90,  paint: (c,S) => paintHole(c, S, 5),
            fill: .32, blurb: "Slow, but drags food towards you.",
            hello: "You are a black hole. Food comes to you." }
 };
@@ -923,9 +925,9 @@ function topUp(onScreen){
   while (G.bodies.length < want){
     const roll = Math.random();
     let t;
-    if (roll < .68) t = P.r * (.16 + Math.random() * .66);        // something to eat
-    else if (roll < .88) t = P.r * (.86 + Math.random() * .26);   // too close to call
-    else t = P.r * (1.22 + Math.random() * .52);                  // too big for you
+    if (roll < .60) t = P.r * (.16 + Math.random() * .66);        // something to eat
+    else if (roll < .82) t = P.r * (.86 + Math.random() * .26);   // too close to call
+    else t = P.r * (1.22 + Math.random() * .58);                  // too big for you
     /* four is plenty. More than that and they overlap into one black smear. */
     if (t >= KINDS.hole.min){
       if (holes >= 4) t = KINDS.star.min + Math.random() * (KINDS.star.max - KINDS.star.min);
@@ -1012,7 +1014,7 @@ function step(dt){
   const topSpeed = 250 * w.speed / G.cam.scale;
   if (aim.has){
     const dx = tx - P.x, dy = ty - P.y, d = Math.hypot(dx, dy) || 1;
-    const want = Math.min(1, d / (90 / G.cam.scale));
+    const want = Math.min(1, d / (26 / G.cam.scale));
     const ax = dx / d * topSpeed * want, ay = dy / d * topSpeed * want;
     P.vx += (ax - P.vx) * Math.min(1, dt * 3.4);
     P.vy += (ay - P.vy) * Math.min(1, dt * 3.4);
@@ -1033,12 +1035,24 @@ function step(dt){
     const b = G.bodies[i];
     if (!b) continue;
 
-    // a black hole drags its dinner in
+    /* anything smaller than you sees you coming and legs it. It never quite
+       outruns you, so a chase is a chase rather than a lost cause. */
+    if (b.r < P.r){
+      const dx = b.x - P.x, dy = b.y - P.y, d = Math.hypot(dx, dy) || 1;
+      const notice = P.r * 3.5 + b.r;
+      if (d < notice){
+        const panic = topSpeed * .68 * (1 - d / notice);
+        b.vx += (dx / d * panic - b.vx) * Math.min(1, dt * 1.7);
+        b.vy += (dy / d * panic - b.vy) * Math.min(1, dt * 1.7);
+      }
+    }
+
+    // a black hole drags its dinner in, which now beats their running away
     if (G.who === "hole"){
       const dx = P.x - b.x, dy = P.y - b.y, d = Math.hypot(dx, dy) || 1;
-      const reach = P.r * 7;
+      const reach = P.r * 7.5;
       if (d < reach && b.r < P.r * .95){
-        const pull = 260 * (1 - d / reach) / G.cam.scale;
+        const pull = 300 * (1 - d / reach) / G.cam.scale;
         b.vx += dx / d * pull * dt; b.vy += dy / d * pull * dt;
       }
     }
@@ -1047,8 +1061,8 @@ function step(dt){
     const big = b.r > P.r * 1.12;
     if (danger && big){
       const dx = P.x - b.x, dy = P.y - b.y, d = Math.hypot(dx, dy) || 1;
-      if (d < P.r * 16){
-        const chase = topSpeed * .52;
+      if (d < P.r * 12){
+        const chase = topSpeed * .54;
         b.vx += (dx / d * chase - b.vx) * Math.min(1, dt * .7);
         b.vy += (dy / d * chase - b.vy) * Math.min(1, dt * .7);
         nearest = Math.min(nearest, d - b.r - P.r);
@@ -1064,9 +1078,10 @@ function step(dt){
       // swallowed
       G.bodies.splice(i, 1);
       const before = tierIndex(P.r);
-      /* how much of a meal you keep. At .82 the whole game was over in
-         about 22 mouthfuls; this puts a full run at roughly seventy. */
-      P.r = Math.sqrt(P.r * P.r + b.r * b.r * .30);
+      /* How much of a meal you keep. This is the dial that sets how long a
+         game is. At .82 it was over in about 22 mouthfuls. Adam asked for a
+         longer game, so it is now .12, which is roughly 350. */
+      P.r = Math.sqrt(P.r * P.r + b.r * b.r * .12);
       G.eaten++;
       SFX.eat(clamp(b.r / P.r, 0, 1));
       flash(b.name + " · " + kmText(b.km), "var(--good)");
@@ -1081,8 +1096,11 @@ function step(dt){
 
     if (danger && big && P.safe <= 0 && d < P.r + b.r * .55){
       // bitten
-      P.r = Math.sqrt(P.r * P.r * .74);
-      P.safe = 1.7;
+      /* One bite already undoes three or four meals, so this is the wrong dial
+         to make the game hard with: turn it up and the game simply cannot be
+         won. The difficulty comes from more hunters and faster prey instead. */
+      P.r = Math.sqrt(P.r * P.r * .86);
+      P.safe = 2.2;
       G.shake = 15;
       SFX.bite();
       const away = Math.hypot(dx, dy) || 1;

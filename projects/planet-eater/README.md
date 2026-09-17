@@ -11,21 +11,25 @@ Pick who you are first, and it changes how it plays:
 | **Earth** | steady, and starts a little bigger |
 | **Black hole** | slow, but drags anything smaller towards it |
 
-Played by a robot from start to finish, the three take about 2.5, 3.5 and 5
-minutes. The moon was never once caught; the black hole was bitten nineteen
-times.
+Played by a robot from start to finish, a game runs about two to five minutes,
+and the robot loses roughly one in three. A child will take considerably
+longer, because everything smaller than you runs away and has to be chased
+down.
 
 ## The rules
 
 1. Touch anything smaller than you and you swallow it and grow.
-2. Anything bigger is too big to eat. Leave it.
-3. **While you are small, nothing can hurt you.** That was a deliberate choice:
+2. **Everything smaller runs away from you.** It notices you at about three
+   times your own width and bolts, but it never quite outruns you, so a chase
+   is a chase rather than a lost cause. A black hole drags it back instead.
+3. Anything bigger is too big to eat. Leave it.
+4. **While you are small, nothing can hurt you.** That was a deliberate choice:
    the game starts gentle.
-4. Once you are big enough to eat planets, the giants start hunting you and the
+5. Once you are big enough to eat planets, the giants start hunting you and the
    edges of the screen go red when one is close.
-5. A giant that catches you tears a chunk off rather than finishing you on the
+6. A giant that catches you tears a chunk off rather than finishing you on the
    spot. Get bitten enough times and you are gone.
-6. Reach the top and the Milky Way itself turns up.
+7. Reach the top and the Milky Way itself turns up.
 
 Move with a finger, a mouse, or the arrow keys.
 
@@ -63,6 +67,25 @@ The names are real, though, and so are the widths. Swallow Titan and it tells
 you it is 5,150 km across. Ganymede is 5,268. Betelgeuse is 1.2 billion.
 Sagittarius A* is the real black hole at the middle of our galaxy and its
 event horizon really is about 23.6 million km across.
+
+## Tuning it, the second time
+
+Adam asked for it to be longer, for the smaller worlds to run away, and then
+for it to be harder. Those three fight each other, and the robot found out how:
+
+- **The player used to ease off as it neared whatever it was aiming at.** With
+  prey that runs, that made catching anything impossible: thirty minutes and
+  nothing eaten. It now only eases off when right on top of something.
+- **The bite is the wrong dial to make a game hard with.** One bite already
+  undoes three or four meals, so turning it up made the game unwinnable in
+  every single run. The difficulty comes from more hunters, chasing from
+  further out, and quicker prey instead.
+- **A longer game means longer spent being hunted**, so lengthening the climb
+  and hardening the hunt at the same time made it impossible twice over before
+  it settled.
+
+Where it landed: the robot wins about six games in nine, and the three
+characters come out roughly even.
 
 ## Things that had to be fixed
 
